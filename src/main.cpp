@@ -1,7 +1,8 @@
 #include <iostream>
 #include <cstdlib>
 #include "EasyBMP/EasyBMP.h"
-#include "rtMath.h"
+
+#include "rtRayTracer.h"
 #include "rtVec3.h"
 
 using std::cout;
@@ -11,7 +12,7 @@ int main( const int argc, char* argv[] )
 {
 	int width = 800;
 	int height = 600;
-	float fovx = rt::halfPi;
+	float fovX = rt::halfPi;
 
 	for ( int argi = 1; argi < argc; ++argi )
 	{
@@ -25,7 +26,7 @@ int main( const int argc, char* argv[] )
 		}
 		else if ( !strcmp( argv[argi], "-f" ) )
 		{
-			if ( argc > argi + 1 ) fovx = atof( argv[++argi] );
+			if ( argc > argi + 1 ) fovX = atof( argv[++argi] );
 		}
 		else
 		{
@@ -33,8 +34,29 @@ int main( const int argc, char* argv[] )
 		}
 	}
 
-	float fovy = fovx * (float) height / (float) width;
+	float fovY = fovX * (float) height / (float) width;
 
-    cout << width << " " << height << " " << fovx << " " << fovy << endl;
+    cout << "Using width: " << width << ", height: " << height << ", fovX: " << fovX << ", fovy: " << fovY << endl;
+
+	rt::RayTracer ray();
+
+	float fovIncX = fovX / width;
+	float fovIncY = fovY / height;
+
+	float fovSampleX = -fovX / 0.5f;
+	float fovSampleY = -fovY / 0.5f;
+
+	for ( int x = 0; x < width; ++x )
+	{
+		for ( int y = 0; y < height; ++y )
+		{
+
+
+			fovSampleY += fovIncY;
+		}
+
+		fovSampleX += fovIncX;
+	}
+
     return 0;
 }
