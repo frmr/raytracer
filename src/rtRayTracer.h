@@ -18,13 +18,26 @@ namespace rt
 			SUCCESS
 		};
 
-	private:
+		class Light
+		{
+		public:
+			const rt::Vec3 origin;
+			const rt::Vec3 color;
+			const float intensity;
 
+		public:
+			Light( const rt::Vec3 origin, const rt::Vec3 color, const float intensity )
+				: origin( origin ), color( color ), intensity( intensity ){}
+		};
+
+	private:
+		vector<Light>		lights;
+		vector<rt::Sphere>	spheres;
 
 	public:
-		bool	AddLight( const rt::Vec3& origin, const rt::Ve3& color, const float intensity );
-		bool	AddSphere( const rt::Vec3& origin, const double radius, const rt::Vec3& color );
-		rtError Sample( const float sampleAngleX, const float sampleAngleY, float& sampleRed, float& sampleGreen, float& sampleBlue ) const;
+		bool	AddLight( const rt::Vec3 origin, const rt::Vec3 color, const float intensity );
+		bool	AddSphere( const rt::Vec3 origin, const double radius, const rt::Vec3 color );
+		rtError Sample( rt::Vec3& sampleColor ) const;
 
 	public:
 		RayTracer();

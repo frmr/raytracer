@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include "EasyBMP/EasyBMP.h"
 
+#include "rtMath.h"
 #include "rtRayTracer.h"
 #include "rtVec3.h"
 
@@ -38,7 +39,9 @@ int main( const int argc, char* argv[] )
 
     cout << "Using width: " << width << ", height: " << height << ", fovX: " << fovX << ", fovy: " << fovY << endl;
 
-	rt::RayTracer ray();
+	rt::RayTracer ray;
+	ray.AddSphere( rt::Vec3( 0.0f, 0.0f, 10.0f ), 1.0f, rt::Vec3( 1.0f, 0.0f, 0.0f ) );
+	ray.AddLight( rt::Vec3( 10.0f, 0.0f, 10.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 1.0f );
 
 	float fovIncX = fovX / width;
 	float fovIncY = fovY / height;
@@ -50,7 +53,8 @@ int main( const int argc, char* argv[] )
 	{
 		for ( int y = 0; y < height; ++y )
 		{
-
+			rt::Vec3 sampleColor;
+			ray.Sample( sampleColor );
 
 			fovSampleY += fovIncY;
 		}
