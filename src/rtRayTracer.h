@@ -3,7 +3,6 @@
 
 #include <vector>
 
-#include "rtSphere.h"
 #include "rtVec3.h"
 
 using std::vector;
@@ -30,13 +29,19 @@ namespace rt
 				: origin( origin ), color( color ), intensity( intensity ){}
 		};
 
+		class Sphere
+		{
+		public:
+			Sphere( const rt::Vec3 origin, const float radius, const rt::Vec3 color );
+		};
+
 	private:
 		vector<Light>		lights;
-		vector<rt::Sphere>	spheres;
+		vector<Sphere>	spheres;
 
 	public:
 		bool	AddLight( const rt::Vec3 origin, const rt::Vec3 color, const float intensity );
-		bool	AddSphere( const rt::Vec3 origin, const double radius, const rt::Vec3 color );
+		bool	AddSphere( const rt::Vec3 origin, const float radius, const rt::Vec3 color );
 		rtError Sample( rt::Vec3& sampleColor ) const;
 
 	public:

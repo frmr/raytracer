@@ -1,5 +1,7 @@
 #include <iostream>
 #include <cstdlib>
+#include <string>
+
 #include "EasyBMP/EasyBMP.h"
 
 #include "rtMath.h"
@@ -8,12 +10,14 @@
 
 using std::cout;
 using std::endl;
+using std::string;
 
 int main( const int argc, char* argv[] )
 {
 	int width = 800;
 	int height = 600;
 	float fovX = rt::halfPi;
+	string outputFilename = "output";
 
 	for ( int argi = 1; argi < argc; ++argi )
 	{
@@ -29,6 +33,10 @@ int main( const int argc, char* argv[] )
 		{
 			if ( argc > argi + 1 ) fovX = atof( argv[++argi] );
 		}
+		else if ( !strcmp( argv[argi], "-o" ) )
+		{
+			if ( argc > argi + 1 ) outputFilename = argv[++argi];
+		}
 		else
 		{
 			cout << "Argument \"" << argv[argi] << "\" not recognised." << endl;
@@ -38,10 +46,14 @@ int main( const int argc, char* argv[] )
 	float fovY = fovX * (float) height / (float) width;
 
     cout << "Using width: " << width << ", height: " << height << ", fovX: " << fovX << ", fovy: " << fovY << endl;
+    cout << "Will output to " << outputFilename << ".bmp" << endl;
 
 	rt::RayTracer ray;
 	ray.AddSphere( rt::Vec3( 0.0f, 0.0f, 10.0f ), 1.0f, rt::Vec3( 1.0f, 0.0f, 0.0f ) );
 	ray.AddLight( rt::Vec3( 10.0f, 0.0f, 10.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 1.0f );
+
+	BMP output;
+	output.SetSize( width, height );
 
 	float fovIncX = fovX / width;
 	float fovIncY = fovY / height;
@@ -55,12 +67,21 @@ int main( const int argc, char* argv[] )
 		{
 			rt::Vec3 sampleColor;
 			ray.Sample( sampleColor );
+			output( x, y )->Red = (int) ( sampleColor.x * 255.0f );
+			output( x, y )->Green = (int) ( sampleColor.y * 255.0f );
+			output( x, y )->Blue = (int) ( sampleColor.z * 255.0f );
 
 			fovSampleY += fovIncY;
 		}
 
 		fovSampleX += fovIncX;
 	}
+
+	cout << "Outputting to " << outputFilename << ".bmp" << endl;
+
+	output.WriteToFile( ( outputFilename + ".bmp" ).c_str() );
+
+	cout << "Done" << endl;
 
     return 0;
 }

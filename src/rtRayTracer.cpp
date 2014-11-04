@@ -6,8 +6,9 @@ bool rt::RayTracer::AddLight( const rt::Vec3 origin, const rt::Vec3 color, const
 	return true;
 }
 
-bool rt::RayTracer::AddSphere( const rt::Vec3 origin, const double radius, const rt::Vec3 color )
+bool rt::RayTracer::AddSphere( const rt::Vec3 origin, const float radius, const rt::Vec3 color )
 {
+	spheres.push_back( rt::Sphere)
 	return true;
 }
 
