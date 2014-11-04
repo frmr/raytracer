@@ -1,4 +1,5 @@
 #include <iostream>
+#include "EasyBMP/EasyBMP.h"
 
 using namespace std;
 
