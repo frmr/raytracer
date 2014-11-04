@@ -67,7 +67,7 @@ rt::Vec3& rt::Vec3::operator/=( const float& rhs )
 }
 
 rt::Vec3::Vec3()
-	:	x( 0.0 ), y( 0.0 ), z( 0.0 )
+	:	x( 0.0f ), y( 0.0f ), z( 0.0f )
 {
 }
 

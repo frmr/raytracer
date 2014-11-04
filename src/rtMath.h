@@ -5,9 +5,9 @@
 
 namespace rt
 {
-	static constexpr float pi = 3.141592653589793238462643383279502884;
-	static constexpr float halfPi = pi / 2.0;
-	static constexpr float twoPi = pi * 2.0;
+	static constexpr float pi = 3.1415926535897932384626f;
+	static constexpr float halfPi = pi / 2.0f;
+	static constexpr float twoPi = pi * 2.0f;
 
 	rt::Vec3	CrossProduct( const rt::Vec3& vecA, const rt::Vec3& vecB );
 	float		DotProduct( const rt::Vec3& vecA, const rt::Vec3& vecB );
