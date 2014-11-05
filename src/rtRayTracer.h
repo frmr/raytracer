@@ -1,10 +1,12 @@
 #ifndef RT_RAY_TRACER_H
 #define RT_RAY_TRACER_H
 
+#include <memory>
 #include <vector>
 
 #include "rtVec3.h"
 
+using std::shared_ptr;
 using std::vector;
 
 namespace rt
@@ -17,6 +19,9 @@ namespace rt
 			SUCCESS
 		};
 
+
+
+
 		class Light
 		{
 		public:
@@ -25,24 +30,73 @@ namespace rt
 			const float intensity;
 
 		public:
-			Light( const rt::Vec3 origin, const rt::Vec3 color, const float intensity )
-				: origin( origin ), color( color ), intensity( intensity ){}
+			Light( const rt::Vec3 origin, const rt::Vec3 color, const float intensity );
 		};
 
-		class Sphere
+
+
+
+		class Entity
 		{
 		public:
-			Sphere( const rt::Vec3 origin, const float radius, const rt::Vec3 color );
+			const rt::Vec3	color;
+			const float		reflectivity;
+
+		public:
+			virtual bool CheckIntersection( const rt::Vec3& rayVector, rt::Vec3& rayColor, float& rayPower ) const = 0;
+
+		protected:
+			Entity( const rt::Vec3 color, const float reflectivity );
 		};
 
+
+
+
+		class Polygon : public Entity
+		{
+		public:
+			const rt::Vec3 vert0;
+			const rt::Vec3 vert1;
+			const rt::Vec3 vert2;
+			const rt::Vec3 vec01;
+			const rt::Vec3 vec02;
+			const rt::Vec3 normal;
+
+		public:
+			bool CheckIntersection( const rt::Vec3& rayVector, rt::Vec3& rayColor, float& rayPower ) const;
+
+		public:
+			Polygon( const rt::Vec3 vert0, const rt::Vec3 vert1, const rt::Vec3 vert2, const rt::Vec3 color, const float reflectivity );
+		};
+
+
+
+
+		class Sphere : public Entity
+		{
+		public:
+			const rt::Vec3	origin;
+			const float		radius;
+
+		public:
+			bool CheckIntersection( const rt::Vec3& rayVector, rt::Vec3& rayColor, float& rayPower ) const;
+
+		public:
+			Sphere( const rt::Vec3 origin, const float radius, const rt::Vec3 color, const float reflectivity );
+		};
+
+
+
 	private:
-		vector<Light>		lights;
-		vector<Sphere>	spheres;
+		vector<Light>				lights;
+		vector<shared_ptr<Entity>>	entities; //use unique_ptr in C++14
 
 	public:
 		bool	AddLight( const rt::Vec3 origin, const rt::Vec3 color, const float intensity );
-		bool	AddSphere( const rt::Vec3 origin, const float radius, const rt::Vec3 color );
-		rtError Sample( rt::Vec3& sampleColor ) const;
+		bool	AddPolygon( const rt::Vec3 vert0, const rt::Vec3 vert1, const rt::Vec3 vert2, const rt::Vec3 color, const float reflectivity );
+		bool	AddSphere( const rt::Vec3 origin, const float radius, const rt::Vec3 color, const float reflectivity );
+		rtError Sample( const float sampleAngleX, const float sampleAngleY, rt::Vec3& sampleColor ) const;
+		rtError Sample( const rt::Vec3 rayVector, rt::Vec3& sampleColor ) const;
 
 	public:
 		RayTracer();

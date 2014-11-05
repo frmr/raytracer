@@ -48,9 +48,9 @@ int main( const int argc, char* argv[] )
     cout << "Using width: " << width << ", height: " << height << ", fovX: " << fovX << ", fovy: " << fovY << endl;
     cout << "Will output to " << outputFilename << ".bmp" << endl;
 
-	rt::RayTracer ray;
-	ray.AddSphere( rt::Vec3( 0.0f, 0.0f, 10.0f ), 1.0f, rt::Vec3( 1.0f, 0.0f, 0.0f ) );
-	ray.AddLight( rt::Vec3( 10.0f, 0.0f, 10.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 1.0f );
+	rt::RayTracer rayTracer;
+	rayTracer.AddSphere( rt::Vec3( 0.0f, 0.0f, 10.0f ), 1.0f, rt::Vec3( 1.0f, 0.0f, 0.0f ), 0.5f );
+	rayTracer.AddLight( rt::Vec3( 10.0f, 0.0f, 10.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 1.0f );
 
 	BMP output;
 	output.SetSize( width, height );
@@ -66,7 +66,7 @@ int main( const int argc, char* argv[] )
 		for ( int y = 0; y < height; ++y )
 		{
 			rt::Vec3 sampleColor;
-			ray.Sample( sampleColor );
+			rayTracer.Sample( fovSampleX, fovSampleY, sampleColor );
 			output( x, y )->Red = (int) ( sampleColor.x * 255.0f );
 			output( x, y )->Green = (int) ( sampleColor.y * 255.0f );
 			output( x, y )->Blue = (int) ( sampleColor.z * 255.0f );
