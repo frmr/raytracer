@@ -3,6 +3,11 @@
 #include "rtMath.h"
 #include <cmath>
 
+float rt::Vec3::Length() const
+{
+	return sqrt( x * x + y * y + z * z );
+}
+
 rt::Vec3 rt::Vec3::Reverse() const
 {
 	return rt::Vec3( -x, -y, -z );

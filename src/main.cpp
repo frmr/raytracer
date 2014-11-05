@@ -45,6 +45,8 @@ int main( const int argc, char* argv[] )
 
 	float fovY = fovX * (float) height / (float) width;
 
+	float distToProjPlane = (float) ( width / 2 ) / tan( fovX / 2.0f );
+
     cout << "Using width: " << width << ", height: " << height << ", fovX: " << fovX << ", fovy: " << fovY << endl;
     cout << "Will output to " << outputFilename << ".bmp" << endl;
 
@@ -55,16 +57,18 @@ int main( const int argc, char* argv[] )
 	BMP output;
 	output.SetSize( width, height );
 
-	float fovIncX = fovX / width;
-	float fovIncY = fovY / height;
+	float fovIncX = fovX / (float) width;
+	float fovIncY = fovY / (float) height;
 
-	float fovSampleX = -fovX / 0.5f;
-	float fovSampleY = -fovY / 0.5f;
+	float fovSampleX = -fovX / 2.0f;
 
 	for ( int x = 0; x < width; ++x )
 	{
+		float fovSampleY = -fovY / 2.0f;
+
 		for ( int y = 0; y < height; ++y )
 		{
+			//cout << "z\t" << x << "\ty\t" << y << "\tax\t" << fovSampleX << "\tay\t" << fovSampleY << endl;
 			rt::Vec3 sampleColor;
 			rayTracer.Sample( fovSampleX, fovSampleY, sampleColor );
 			output( x, y )->Red = (int) ( sampleColor.x * 255.0f );

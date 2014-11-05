@@ -11,6 +11,7 @@ namespace rt
 		float	x, y, z;
 
 	public:
+		float			Length() const;
 		Vec3			Reverse() const;
 		Vec3			Unit() const;
 
