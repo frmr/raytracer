@@ -2,6 +2,9 @@
 #include "rtMath.h"
 #include <cmath>
 
+#include <iostream>
+using namespace std;
+
 rt::RayTracer::Light::Light( const rt::Vec3 origin, const rt::Vec3 color, const float intensity )
 	:	origin( origin ), color( color ), intensity( intensity )
 {
@@ -30,48 +33,53 @@ rt::RayTracer::Polygon::Polygon( const rt::Vec3 vert0, const rt::Vec3 vert1, con
 
 bool rt::RayTracer::Sphere::CheckIntersection( const rt::Vec3& rayVector, const float rayPower, rt::Vec3& rayColor ) const
 {
-	float dotOriginRay = rt::DotProduct( origin, rayVector );
-
-	//Not necessary since the camera can't move, so all spheres are probably visible
-//	if ( dotOriginRay < 0.0f )
-//	{
-//		return false;
-//	}
-
-//	Vector3d oc = m_Center - ray.origin;
+//	float dotOriginRay = rt::DotProduct( origin, rayVector );
 //
-//	double tca = Dot(oc, ray.dir);
-//	if (tca < 0)
+//	float b = rt::DotProduct( rayVector, origin );
+//	float c = rt::DotProduct( origin, origin ) - radiusSquared;
+//	float deltabis = b * b - c;
+//
+//	//cout << deltabis << endl;
+//
+//	if (deltabis < 0 || deltabis > 1 )
 //	{
-//		// points away from the sphere
 //		return false;
 //	}
+//
+//	rayColor = color;
+//
+//	return true;
 
-//	if ( rayVector.x <= 0.0f )
-//	{
-//		rayColor = rt::Vec3( 1.0f, 0.0f, 0.0f );
-//		return true;
-//	}
-//	else
-//	{
-//		rayColor = rt::Vec3( 0.0f, 0.0f, 1.0f );
-//		return true;
-//	}
+	rt::Vec3 temp = origin.Reverse();
 
+	float a = rt::DotProduct( rayVector, rayVector );
+	float b = 2.0f * rt::DotProduct( rayVector, temp );
+	float c = rt::DotProduct( temp, temp ) - radiusSquared;
 
-	double l2hc = ( radiusSquared - vectorLengthSquared ) + ( dotOriginRay * dotOriginRay );
-	if ( l2hc > 0 )
+	// this is the term under the square-root
+	// (see solution for quadratc equation)
+	float discriminant = ( b * b ) - ( 4.0f * a * c );
+	//first check if ray intersects sphere
+
+	if ( discriminant > 0.0f )
 	{
+		discriminant = sqrt( discriminant );
+		float t = ( -b - discriminant ) / ( 2 * a );
+
+		// check for valid interval
+		//if (t < tmin) t = (-b + discriminant) / (2*a);
+
+		//if (t < tmin || t > tmax) return false;
+
+		// all good, assign values
+		//record.t = t;
+		//record.normal = unitVector(r.origin() + t*r.direction() - center);
 		rayColor = color;
-//		double t = tca - sqrt(l2hc);
-//		// calculate position
-//		pos = ray.origin + ray.dir * t;
-//		// radius ray
-//		normal = pos - m_Center;
-//		normal.Normalize();
 		return true;
 	}
 	return false;
+
+
 }
 
 rt::RayTracer::Sphere::Sphere( const rt::Vec3 origin, const float radius, const rt::Vec3 color, const float reflectivity )
@@ -101,9 +109,11 @@ bool rt::RayTracer::AddSphere( const rt::Vec3 origin, const float radius, const 
 rt::RayTracer::rtError rt::RayTracer::Sample( const float sampleAngleX, const float sampleAngleY, rt::Vec3& sampleColor ) const
 {
 	//convert angle to vector
-	rt::Vec3 rayVector( sin( sampleAngleX ), tan( sampleAngleY ), sin( sampleAngleX ) );
+	rt::Vec3 rayVector( sin( sampleAngleX ), tan( sampleAngleY ), cos( sampleAngleX ) );
 	//rt::Vec3 rayVector( distToProjPlane * tan( sampleAngleX ), distToProjPlane * tan( sampleAngleY ), distToProjPlane );
 	rayVector.Unit(); //might not be necessary
+
+	//cout << rayVector.x << " " << rayVector.y << " " << rayVector.z << endl;
 
 	return Sample( rayVector, sampleColor );
 }
