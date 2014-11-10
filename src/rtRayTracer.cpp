@@ -11,20 +11,20 @@ rt::RayTracer::Light::Light( const rt::Vec3 origin, const rt::Vec3 color, const 
 
 }
 
-rt::RayTracer::Entity::Entity( const rt::Vec3 color, const float reflectivity )
+rt::RayTracer::Shape::Shape( const rt::Vec3 color, const float reflectivity )
 	:	color( color ), reflectivity( reflectivity )
 {
 }
 
-bool rt::RayTracer::Polygon::CheckIntersection( const rt::Vec3& rayVector, const float rayPower, rt::Vec3& rayColor ) const
+bool rt::RayTracer::Triangle::CheckIntersection( const rt::Vec3& rayVector, const float rayPower, rt::Vec3& rayColor ) const
 {
 	//get plane intersection point
 	//check if point is within triangle
     return true;
 }
 
-rt::RayTracer::Polygon::Polygon( const rt::Vec3 vert0, const rt::Vec3 vert1, const rt::Vec3 vert2, const rt::Vec3 color, const float reflectivity )
-	:	Entity( color, reflectivity ),
+rt::RayTracer::Triangle::Triangle( const rt::Vec3 vert0, const rt::Vec3 vert1, const rt::Vec3 vert2, const rt::Vec3 color, const float reflectivity )
+	:	Shape( color, reflectivity ),
 		vert0( vert0 ), vert1( vert1 ), vert2( vert2 ),
         vec01( ( vert1 - vert0 ).Unit() ), vec02( ( vert2 - vert0 ).Unit() ),
         normal( rt::CrossProduct( vec01, vec02 ) )
@@ -74,6 +74,8 @@ bool rt::RayTracer::Sphere::CheckIntersection( const rt::Vec3& rayVector, const 
 		// all good, assign values
 		//record.t = t;
 		//record.normal = unitVector(r.origin() + t*r.direction() - center);
+		//sr.local_hit_point = ray.o + t * ray.d;
+
 		rayColor = color;
 		return true;
 	}
@@ -83,7 +85,7 @@ bool rt::RayTracer::Sphere::CheckIntersection( const rt::Vec3& rayVector, const 
 }
 
 rt::RayTracer::Sphere::Sphere( const rt::Vec3 origin, const float radius, const rt::Vec3 color, const float reflectivity )
-	:	Entity( color, reflectivity ),
+	:	Shape( color, reflectivity ),
 		origin( origin ), vectorLengthSquared( origin.Length() * origin.Length() ), radius( radius ), radiusSquared( radius * radius )
 {
 }
@@ -94,9 +96,9 @@ bool rt::RayTracer::AddLight( const rt::Vec3 origin, const rt::Vec3 color, const
 	return true;
 }
 
-bool rt::RayTracer::AddPolygon( const rt::Vec3 vert0, const rt::Vec3 vert1, const rt::Vec3 vert2, const rt::Vec3 color, const float reflectivity )
+bool rt::RayTracer::AddTriangle( const rt::Vec3 vert0, const rt::Vec3 vert1, const rt::Vec3 vert2, const rt::Vec3 color, const float reflectivity )
 {
-	entities.push_back( std::make_shared<Polygon>( vert0, vert1, vert2, color, reflectivity ) );
+	entities.push_back( std::make_shared<Triangle>( vert0, vert1, vert2, color, reflectivity ) );
 	return true;
 }
 
@@ -120,9 +122,9 @@ rt::RayTracer::rtError rt::RayTracer::Sample( const float sampleAngleX, const fl
 
 rt::RayTracer::rtError rt::RayTracer::Sample( const rt::Vec3 rayVector, rt::Vec3& sampleColor ) const
 {
-	for ( auto entity : entities )
+	for ( auto Shape : entities )
 	{
-		entity->CheckIntersection( rayVector, 1.0f, sampleColor );
+		Shape->CheckIntersection( rayVector, 1.0f, sampleColor );
 	}
 
 	return rt::RayTracer::rtError::SUCCESS;

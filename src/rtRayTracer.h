@@ -40,7 +40,7 @@ namespace rt
 
 
 
-		class Entity
+		class Shape
 		{
 		public:
 			const rt::Vec3	color;
@@ -50,13 +50,13 @@ namespace rt
 			virtual bool CheckIntersection( const rt::Vec3& rayVector, const float rayPower, rt::Vec3& rayColor ) const = 0;
 
 		protected:
-			Entity( const rt::Vec3 color, const float reflectivity );
+			Shape( const rt::Vec3 color, const float reflectivity );
 		};
 
 
 
 
-		class Polygon : public Entity
+		class Triangle : public Shape
 		{
 		public:
 			const rt::Vec3 vert0;
@@ -70,13 +70,13 @@ namespace rt
 			bool CheckIntersection( const rt::Vec3& rayVector, const float rayPower, rt::Vec3& rayColor ) const;
 
 		public:
-			Polygon( const rt::Vec3 vert0, const rt::Vec3 vert1, const rt::Vec3 vert2, const rt::Vec3 color, const float reflectivity );
+			Triangle( const rt::Vec3 vert0, const rt::Vec3 vert1, const rt::Vec3 vert2, const rt::Vec3 color, const float reflectivity );
 		};
 
 
 
 
-		class Sphere : public Entity
+		class Sphere : public Shape
 		{
 		public:
 			const rt::Vec3	origin;
@@ -96,11 +96,11 @@ namespace rt
 
 	private:
 		vector<Light>				lights;
-		vector<shared_ptr<Entity>>	entities; //use unique_ptr in C++14
+		vector<shared_ptr<Shape>>	entities; //use unique_ptr in C++14
 
 	public:
 		bool	AddLight( const rt::Vec3 origin, const rt::Vec3 color, const float intensity );
-		bool	AddPolygon( const rt::Vec3 vert0, const rt::Vec3 vert1, const rt::Vec3 vert2, const rt::Vec3 color, const float reflectivity );
+		bool	AddTriangle( const rt::Vec3 vert0, const rt::Vec3 vert1, const rt::Vec3 vert2, const rt::Vec3 color, const float reflectivity );
 		bool	AddSphere( const rt::Vec3 origin, const float radius, const rt::Vec3 color, const float reflectivity );
 		rtError Sample( const float sampleAngleX, const float sampleAngleY, rt::Vec3& sampleColor ) const;
 		rtError Sample( const rt::Vec3 rayVector, rt::Vec3& sampleColor ) const;
