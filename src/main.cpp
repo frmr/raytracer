@@ -52,7 +52,7 @@ int main( const int argc, char* argv[] )
 
 	rt::RayTracer rayTracer;
 	rayTracer.AddSphere( rt::Vec3( 0.0f, 0.0f, 10.0f ), 1.0f, rt::Vec3( 1.0f, 0.0f, 0.0f ), 0.5f );
-	rayTracer.AddLight( rt::Vec3( 10.0f, 0.0f, 10.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 1.0f );
+	rayTracer.AddLight( rt::Vec3( 5.0f, 5.0f, 5.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 1.0f );
 
 	BMP output;
 	output.SetSize( width, height );

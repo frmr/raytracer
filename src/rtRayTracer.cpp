@@ -16,7 +16,7 @@ rt::RayTracer::Shape::Shape( const rt::Vec3 color, const float reflectivity )
 {
 }
 
-bool rt::RayTracer::Triangle::CheckIntersection( const rt::Vec3& rayVector, const float rayPower, rt::Vec3& rayColor ) const
+bool rt::RayTracer::Triangle::CheckIntersection( const rt::Vec3& rayVector, const float rayPower, const vector<rt::RayTracer::Light>& lights, rt::Vec3& rayColor ) const
 {
 	//get plane intersection point
 	//check if point is within triangle
@@ -31,7 +31,7 @@ rt::RayTracer::Triangle::Triangle( const rt::Vec3 vert0, const rt::Vec3 vert1, c
 {
 }
 
-bool rt::RayTracer::Sphere::CheckIntersection( const rt::Vec3& rayVector, const float rayPower, rt::Vec3& rayColor ) const
+bool rt::RayTracer::Sphere::CheckIntersection( const rt::Vec3& rayVector, const float rayPower, const vector<rt::RayTracer::Light>& lights, rt::Vec3& rayColor ) const
 {
 //	float dotOriginRay = rt::DotProduct( origin, rayVector );
 //
@@ -67,16 +67,24 @@ bool rt::RayTracer::Sphere::CheckIntersection( const rt::Vec3& rayVector, const 
 		float t = ( -b - discriminant ) / ( 2 * a );
 
 		// check for valid interval
-		//if (t < tmin) t = (-b + discriminant) / (2*a);
+		if ( t < 0.0f ) t = ( -b + discriminant ) / ( 2.0f * a );
+		if (t < 0.0f || t > 100.0f) return false; //TODO: tmin and tmax
 
-		//if (t < tmin || t > tmax) return false;
+		rt::Vec3 intersection = rayVector * t;
+		rt::Vec3 normal = ( intersection - origin ).Unit();
 
-		// all good, assign values
-		//record.t = t;
-		//record.normal = unitVector(r.origin() + t*r.direction() - center);
-		//sr.local_hit_point = ray.o + t * ray.d;
+		for ( auto light : lights )
+		{
+			float dotLight = rt::DotProduct( normal, ( light.origin - intersection ).Unit() );
+			if ( dotLight > 0.0f )
+			{
+				rayColor += color * rt::DotProduct( normal, ( light.origin - intersection ).Unit() );
+			}
 
-		rayColor = color;
+		}
+
+
+		//rayColor = color;
 		return true;
 	}
 	return false;
@@ -124,7 +132,7 @@ rt::RayTracer::rtError rt::RayTracer::Sample( const rt::Vec3 rayVector, rt::Vec3
 {
 	for ( auto Shape : entities )
 	{
-		Shape->CheckIntersection( rayVector, 1.0f, sampleColor );
+		Shape->CheckIntersection( rayVector, 1.0f, lights, sampleColor );
 	}
 
 	return rt::RayTracer::rtError::SUCCESS;
