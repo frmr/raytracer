@@ -1,7 +1,11 @@
 #include <iostream>
 #include <cstdlib>
+#include <functional>
+#include <memory>
+#include <mutex>
 #include <string>
 #include <thread>
+#include <utility>
 
 #include "EasyBMP/EasyBMP.h"
 
@@ -13,9 +17,49 @@ using std::cout;
 using std::endl;
 using std::string;
 
-void sampleRayTracer( const rt::Vec3 rayVector, BMP& output )
-{
+std::mutex rayLock;
 
+void SetupScene( rt::RayTracer& rayTracer )
+{
+	rayTracer.AddSphere( rt::Vec3( -5.0f, 0.0f, 10.0f ), 1.0f, rt::Vec3( 1.0f, 0.0f, 0.0f ), 0.5f );
+	rayTracer.AddSphere( rt::Vec3( 0.0f, -5.0f, 10.0f ), 1.0f, rt::Vec3( 0.0f, 1.0f, 0.0f ), 0.5f );
+	rayTracer.AddSphere( rt::Vec3( 0.0f, 0.0f, 10.0f ), 1.0f, rt::Vec3( 0.0f, 0.0f, 1.0f ), 0.5f );
+	rayTracer.AddSphere( rt::Vec3( 0.0f, 5.0f, 10.0f ), 1.0f, rt::Vec3( 1.0f, 0.0f, 1.0f ), 0.5f );
+	rayTracer.AddSphere( rt::Vec3( 5.0f, 0.0f, 10.0f ), 1.0f, rt::Vec3( 0.0f, 1.0f, 1.0f ), 0.5f );
+	rayTracer.AddLight( rt::Vec3( 5.0f, 5.0f, 5.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 1.0f );
+}
+
+void SampleRayTracer( const rt::RayTracer& rayTracer, const int width, const int height, rt::Vec3& rayVector, int& x, int& y, BMP& output )
+{
+	rt::Vec3 myVector;
+	int myX, myY;
+
+	rayLock.lock();
+	while ( x < width )
+	{
+		myVector = rayVector.Unit();
+		myX = x;
+		myY = y++;
+		rayVector.y--;
+
+		if ( y == height )
+		{
+			y = 0;
+			rayVector.y = height / 2.0f - 0.5f;
+
+			x++;
+			rayVector.x++;
+		}
+		rayLock.unlock();
+
+		rt::Vec3 sampleColor;
+		rayTracer.Sample( myVector, sampleColor );
+		rayLock.lock();
+			output( myX, myY )->Red = (int) ( sampleColor.x * 255.0f );
+			output( myX, myY )->Green = (int) ( sampleColor.y * 255.0f );
+			output( myX, myY )->Blue = (int) ( sampleColor.z * 255.0f );
+		rayLock.unlock();
+	}
 }
 
 int main( const int argc, char* argv[] )
@@ -51,40 +95,34 @@ int main( const int argc, char* argv[] )
 
 	float fovY = fovX * (float) height / (float) width;
 
-	float distToProjPlane = (float) ( width / 2 ) / tan( fovX / 2.0f );
+	float distToProjPlane = ( (float) width / 2.0f ) / tan( fovX / 2.0f );
 
     cout << "Using width: " << width << ", height: " << height << ", fovX: " << fovX << ", fovy: " << fovY << endl;
     cout << "Will output to " << outputFilename << ".bmp" << endl;
 
 	rt::RayTracer rayTracer;
-	rayTracer.AddSphere( rt::Vec3( 0.0f, 0.0f, 10.0f ), 1.0f, rt::Vec3( 1.0f, 0.0f, 0.0f ), 0.5f );
-	rayTracer.AddLight( rt::Vec3( 5.0f, 5.0f, 5.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 1.0f );
+	SetupScene( rayTracer );
 
 	BMP output;
 	output.SetSize( width, height );
 
+	const int maxThreads = 4;
 	vector<std::thread> threads;
-	int maxThreads = 4;
 
-	rt::Vec3 rayVector( ( -width / 2.0f ) + 0.5f, 0.0f, distToProjPlane );
+	int x = 0;
+	int y = 0;
+	rt::Vec3 rayVector( -width / 2.0f + 0.5f, height / 2.0f - 0.5f, distToProjPlane );
 
-	for ( int x = 0; x < width; ++x )
+	for ( int i = 0; i  < maxThreads; ++i )
 	{
-		rayVector.y = ( -height / 2.0f ) + 0.5f;
+		threads.push_back( std::thread( SampleRayTracer, std::cref(rayTracer), width, height, std::ref( rayVector ), std::ref(x), std::ref(y), std::ref(output) ) );
+	}
 
-		for ( int y = 0; y < height; ++y )
-		{
-			//cout << rayVector.x << "\t" << rayVector.y << "\t" << rayVector.z << endl;
-			rt::Vec3 sampleColor;
-			rayTracer.Sample( rayVector, sampleColor );
-			output( x, y )->Red = (int) ( sampleColor.x * 255.0f );
-			output( x, y )->Green = (int) ( sampleColor.y * 255.0f );
-			output( x, y )->Blue = (int) ( sampleColor.z * 255.0f );
+	cout << "Using " << threads.size() << " threads." << endl;
 
-			rayVector.y++;
-		}
-
-		rayVector.x++;
+	for ( vector<std::thread>::iterator it = threads.begin(); it != threads.end(); ++it )
+	{
+		it->join();
 	}
 
 	cout << "Outputting to " << outputFilename << ".bmp" << endl;
