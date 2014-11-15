@@ -11,12 +11,19 @@ rt::RayTracer::Light::Light( const rt::Vec3 origin, const rt::Vec3 color, const 
 
 }
 
+int rt::RayTracer::Shape::idCounter = 0;
+
 rt::RayTracer::Shape::Shape( const rt::Vec3 color, const float reflectivity )
-	:	color( color ), reflectivity( reflectivity )
+	:	id( idCounter++ ), color( color ), reflectivity( reflectivity )
 {
 }
 
-bool rt::RayTracer::Triangle::CheckIntersection( const rt::Vec3& rayVector, const float rayPower, const vector<rt::RayTracer::Light>& lights, rt::Vec3& rayColor ) const
+float rt::RayTracer::Triangle::Intersects( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector ) const
+{
+	return -1.0f;
+}
+
+bool rt::RayTracer::Triangle::CheckIntersection( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, const float rayPower, const vector<rt::RayTracer::Light>& lights, const vector<shared_ptr<rt::RayTracer::Shape>>& shapes, rt::Vec3& rayColor ) const
 {
 	//get plane intersection point
 	//check if point is within triangle
@@ -31,28 +38,32 @@ rt::RayTracer::Triangle::Triangle( const rt::Vec3 vert0, const rt::Vec3 vert1, c
 {
 }
 
-bool rt::RayTracer::Sphere::CheckIntersection( const rt::Vec3& rayVector, const float rayPower, const vector<rt::RayTracer::Light>& lights, rt::Vec3& rayColor ) const
+float rt::RayTracer::Sphere::Intersects( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector ) const
 {
-	rt::Vec3 temp = origin.Reverse();
+	rt::Vec3 temp = rayOrigin - origin;
 
 	float a = rt::DotProduct( rayVector, rayVector );
 	float b = 2.0f * rt::DotProduct( rayVector, temp );
 	float c = rt::DotProduct( temp, temp ) - radiusSquared;
-
-	// this is the term under the square-root
-	// (see solution for quadratc equation)
 	float discriminant = ( b * b ) - ( 4.0f * a * c );
-	//first check if ray intersects sphere
 
 	if ( discriminant > 0.0f )
 	{
 		discriminant = sqrt( discriminant );
-		float t = ( -b - discriminant ) / ( 2 * a );
+		return ( -b - discriminant ) / ( 2.0f * a );
+	}
+	else
+	{
+		return -1.0f;
+	}
+}
 
-		// check for intersections behind the camera
-		//if ( t < 0.0f ) t = ( -b + discriminant ) / ( 2.0f * a );
-		//if (t < 0.0f) return false;
+bool rt::RayTracer::Sphere::CheckIntersection( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, const float rayPower, const vector<rt::RayTracer::Light>& lights, const vector<shared_ptr<rt::RayTracer::Shape>>& shapes, rt::Vec3& rayColor ) const
+{
+	float t = Intersects( rayOrigin, rayVector );
 
+	if ( t )
+	{
 		rt::Vec3 intersection = rayVector * t;
 		rt::Vec3 normal = ( intersection - origin ).Unit();
 
@@ -61,16 +72,33 @@ bool rt::RayTracer::Sphere::CheckIntersection( const rt::Vec3& rayVector, const 
 			float dotLight = rt::DotProduct( normal, ( light.origin - intersection ).Unit() );
 			if ( dotLight > 0.0f )
 			{
-				rayColor += color * rt::DotProduct( normal, ( light.origin - intersection ).Unit() );
+				rt::Vec3 lightVec = ( light.origin - intersection ).Unit();
+				bool occluded = false;
+				for ( const auto& shape : shapes )
+				{
+					if ( !( id == shape->id ) )
+					{
+						if ( shape->Intersects( intersection, lightVec ) > 0.0f )
+						{
+							occluded = true;
+							break;
+						}
+					}
+
+				}
+				if ( !occluded )
+				{
+					rayColor += color * rt::DotProduct( normal, ( light.origin - intersection ).Unit() );
+				}
 			}
 
 		}
-
-
-		//rayColor = color;
 		return true;
 	}
-	return false;
+	else
+	{
+		return false;
+	}
 }
 
 rt::RayTracer::Sphere::Sphere( const rt::Vec3 origin, const float radius, const rt::Vec3 color, const float reflectivity )
@@ -87,33 +115,22 @@ bool rt::RayTracer::AddLight( const rt::Vec3 origin, const rt::Vec3 color, const
 
 bool rt::RayTracer::AddTriangle( const rt::Vec3 vert0, const rt::Vec3 vert1, const rt::Vec3 vert2, const rt::Vec3 color, const float reflectivity )
 {
-	entities.push_back( std::make_shared<Triangle>( vert0, vert1, vert2, color, reflectivity ) );
+	shapes.push_back( std::make_shared<Triangle>( vert0, vert1, vert2, color, reflectivity ) );
 	return true;
 }
 
 bool rt::RayTracer::AddSphere( const rt::Vec3 origin, const float radius, const rt::Vec3 color, const float reflectivity )
 {
-	entities.push_back( std::make_shared<Sphere>( origin, radius, color, reflectivity ) );
+	shapes.push_back( std::make_shared<Sphere>( origin, radius, color, reflectivity ) );
 	return true;
 }
 
-//rt::RayTracer::rtError rt::RayTracer::Sample( const float sampleAngleX, const float sampleAngleY, rt::Vec3& sampleColor ) const
-//{
-//	//convert angle to vector
-//	rt::Vec3 rayVector( sin( sampleAngleX ), tan( sampleAngleY ), cos( sampleAngleX ) );
-//	//rt::Vec3 rayVector( distToProjPlane * tan( sampleAngleX ), distToProjPlane * tan( sampleAngleY ), distToProjPlane );
-//	rayVector.Unit(); //might not be necessary
-//
-//	//cout << rayVector.x << " " << rayVector.y << " " << rayVector.z << endl;
-//
-//	return Sample( rayVector, sampleColor );
-//}
-
 rt::RayTracer::rtError rt::RayTracer::Sample( const rt::Vec3& rayVector, rt::Vec3& sampleColor ) const
 {
-	for ( auto Shape : entities )
+	for ( auto shape : shapes )
 	{
-		Shape->CheckIntersection( rayVector, 1.0f, lights, sampleColor );
+		rt::Vec3 rayOrigin;
+		shape->CheckIntersection( rayOrigin, rayVector, 1.0f, lights, shapes, sampleColor );
 	}
 
 	return rt::RayTracer::rtError::SUCCESS;

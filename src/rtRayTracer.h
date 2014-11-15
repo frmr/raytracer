@@ -42,12 +42,16 @@ namespace rt
 
 		class Shape
 		{
+		private:
+			static int		idCounter;
 		public:
+			const int		id;
 			const rt::Vec3	color;
 			const float		reflectivity;
 
 		public:
-			virtual bool CheckIntersection( const rt::Vec3& rayVector, const float rayPower, const vector<rt::RayTracer::Light>& lights, rt::Vec3& rayColor ) const = 0;
+			virtual float	Intersects( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector ) const = 0;
+			virtual bool	CheckIntersection( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, const float rayPower, const vector<Light>& lights, const vector<shared_ptr<Shape>>& shapes, rt::Vec3& rayColor ) const = 0;
 
 		protected:
 			Shape( const rt::Vec3 color, const float reflectivity );
@@ -67,7 +71,8 @@ namespace rt
 			const rt::Vec3 normal;
 
 		public:
-			bool CheckIntersection( const rt::Vec3& rayVector, const float rayPower, const vector<rt::RayTracer::Light>& lights, rt::Vec3& rayColor ) const;
+			float	Intersects( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector ) const;
+			bool	CheckIntersection( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, const float rayPower, const vector<Light>& lights, const vector<shared_ptr<Shape>>& shapes, rt::Vec3& rayColor ) const;
 
 		public:
 			Triangle( const rt::Vec3 vert0, const rt::Vec3 vert1, const rt::Vec3 vert2, const rt::Vec3 color, const float reflectivity );
@@ -85,7 +90,8 @@ namespace rt
 			const float		radiusSquared;
 
 		public:
-			bool CheckIntersection( const rt::Vec3& rayVector, const float rayPower, const vector<rt::RayTracer::Light>& lights, rt::Vec3& rayColor ) const;
+			float	Intersects( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector ) const;
+			bool	CheckIntersection( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, const float rayPower, const vector<Light>& lights, const vector<shared_ptr<Shape>>& shapes, rt::Vec3& rayColor ) const;
 
 		public:
 			Sphere( const rt::Vec3 origin, const float radius, const rt::Vec3 color, const float reflectivity );
@@ -96,13 +102,12 @@ namespace rt
 
 	private:
 		vector<Light>				lights;
-		vector<shared_ptr<Shape>>	entities; //use unique_ptr in C++14
+		vector<shared_ptr<Shape>>	shapes; //use unique_ptr in C++14
 
 	public:
 		bool	AddLight( const rt::Vec3 origin, const rt::Vec3 color, const float intensity );
 		bool	AddTriangle( const rt::Vec3 vert0, const rt::Vec3 vert1, const rt::Vec3 vert2, const rt::Vec3 color, const float reflectivity );
 		bool	AddSphere( const rt::Vec3 origin, const float radius, const rt::Vec3 color, const float reflectivity );
-		//rtError Sample( const float sampleAngleX, const float sampleAngleY, rt::Vec3& sampleColor ) const;
 		rtError Sample( const rt::Vec3& rayVector, rt::Vec3& sampleColor ) const;
 
 	public:
