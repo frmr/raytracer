@@ -33,23 +33,6 @@ rt::RayTracer::Triangle::Triangle( const rt::Vec3 vert0, const rt::Vec3 vert1, c
 
 bool rt::RayTracer::Sphere::CheckIntersection( const rt::Vec3& rayVector, const float rayPower, const vector<rt::RayTracer::Light>& lights, rt::Vec3& rayColor ) const
 {
-//	float dotOriginRay = rt::DotProduct( origin, rayVector );
-//
-//	float b = rt::DotProduct( rayVector, origin );
-//	float c = rt::DotProduct( origin, origin ) - radiusSquared;
-//	float deltabis = b * b - c;
-//
-//	//cout << deltabis << endl;
-//
-//	if (deltabis < 0 || deltabis > 1 )
-//	{
-//		return false;
-//	}
-//
-//	rayColor = color;
-//
-//	return true;
-
 	rt::Vec3 temp = origin.Reverse();
 
 	float a = rt::DotProduct( rayVector, rayVector );
@@ -66,9 +49,9 @@ bool rt::RayTracer::Sphere::CheckIntersection( const rt::Vec3& rayVector, const 
 		discriminant = sqrt( discriminant );
 		float t = ( -b - discriminant ) / ( 2 * a );
 
-		// check for valid interval
-		if ( t < 0.0f ) t = ( -b + discriminant ) / ( 2.0f * a );
-		if (t < 0.0f || t > 100.0f) return false; //TODO: tmin and tmax
+		// check for intersections behind the camera
+		//if ( t < 0.0f ) t = ( -b + discriminant ) / ( 2.0f * a );
+		//if (t < 0.0f) return false;
 
 		rt::Vec3 intersection = rayVector * t;
 		rt::Vec3 normal = ( intersection - origin ).Unit();
@@ -88,8 +71,6 @@ bool rt::RayTracer::Sphere::CheckIntersection( const rt::Vec3& rayVector, const 
 		return true;
 	}
 	return false;
-
-
 }
 
 rt::RayTracer::Sphere::Sphere( const rt::Vec3 origin, const float radius, const rt::Vec3 color, const float reflectivity )
@@ -116,17 +97,17 @@ bool rt::RayTracer::AddSphere( const rt::Vec3 origin, const float radius, const 
 	return true;
 }
 
-rt::RayTracer::rtError rt::RayTracer::Sample( const float sampleAngleX, const float sampleAngleY, rt::Vec3& sampleColor ) const
-{
-	//convert angle to vector
-	rt::Vec3 rayVector( sin( sampleAngleX ), tan( sampleAngleY ), cos( sampleAngleX ) );
-	//rt::Vec3 rayVector( distToProjPlane * tan( sampleAngleX ), distToProjPlane * tan( sampleAngleY ), distToProjPlane );
-	rayVector.Unit(); //might not be necessary
-
-	//cout << rayVector.x << " " << rayVector.y << " " << rayVector.z << endl;
-
-	return Sample( rayVector, sampleColor );
-}
+//rt::RayTracer::rtError rt::RayTracer::Sample( const float sampleAngleX, const float sampleAngleY, rt::Vec3& sampleColor ) const
+//{
+//	//convert angle to vector
+//	rt::Vec3 rayVector( sin( sampleAngleX ), tan( sampleAngleY ), cos( sampleAngleX ) );
+//	//rt::Vec3 rayVector( distToProjPlane * tan( sampleAngleX ), distToProjPlane * tan( sampleAngleY ), distToProjPlane );
+//	rayVector.Unit(); //might not be necessary
+//
+//	//cout << rayVector.x << " " << rayVector.y << " " << rayVector.z << endl;
+//
+//	return Sample( rayVector, sampleColor );
+//}
 
 rt::RayTracer::rtError rt::RayTracer::Sample( const rt::Vec3 rayVector, rt::Vec3& sampleColor ) const
 {

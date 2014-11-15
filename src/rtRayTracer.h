@@ -102,7 +102,7 @@ namespace rt
 		bool	AddLight( const rt::Vec3 origin, const rt::Vec3 color, const float intensity );
 		bool	AddTriangle( const rt::Vec3 vert0, const rt::Vec3 vert1, const rt::Vec3 vert2, const rt::Vec3 color, const float reflectivity );
 		bool	AddSphere( const rt::Vec3 origin, const float radius, const rt::Vec3 color, const float reflectivity );
-		rtError Sample( const float sampleAngleX, const float sampleAngleY, rt::Vec3& sampleColor ) const;
+		//rtError Sample( const float sampleAngleX, const float sampleAngleY, rt::Vec3& sampleColor ) const;
 		rtError Sample( const rt::Vec3 rayVector, rt::Vec3& sampleColor ) const;
 
 	public:

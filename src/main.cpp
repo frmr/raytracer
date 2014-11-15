@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <string>
+#include <thread>
 
 #include "EasyBMP/EasyBMP.h"
 
@@ -11,6 +12,11 @@
 using std::cout;
 using std::endl;
 using std::string;
+
+void sampleRayTracer( const rt::Vec3 rayVector, BMP& output )
+{
+
+}
 
 int main( const int argc, char* argv[] )
 {
@@ -57,28 +63,28 @@ int main( const int argc, char* argv[] )
 	BMP output;
 	output.SetSize( width, height );
 
-	float fovIncX = fovX / (float) width;
-	float fovIncY = fovY / (float) height;
+	vector<std::thread> threads;
+	int maxThreads = 4;
 
-	float fovSampleX = -fovX / 2.0f;
+	rt::Vec3 rayVector( ( -width / 2.0f ) + 0.5f, 0.0f, distToProjPlane );
 
 	for ( int x = 0; x < width; ++x )
 	{
-		float fovSampleY = -fovY / 2.0f;
+		rayVector.y = ( -height / 2.0f ) + 0.5f;
 
 		for ( int y = 0; y < height; ++y )
 		{
-			//cout << "z\t" << x << "\ty\t" << y << "\tax\t" << fovSampleX << "\tay\t" << fovSampleY << endl;
+			//cout << rayVector.x << "\t" << rayVector.y << "\t" << rayVector.z << endl;
 			rt::Vec3 sampleColor;
-			rayTracer.Sample( fovSampleX, fovSampleY, sampleColor );
+			rayTracer.Sample( rayVector, sampleColor );
 			output( x, y )->Red = (int) ( sampleColor.x * 255.0f );
 			output( x, y )->Green = (int) ( sampleColor.y * 255.0f );
 			output( x, y )->Blue = (int) ( sampleColor.z * 255.0f );
 
-			fovSampleY += fovIncY;
+			rayVector.y++;
 		}
 
-		fovSampleX += fovIncX;
+		rayVector.x++;
 	}
 
 	cout << "Outputting to " << outputFilename << ".bmp" << endl;
