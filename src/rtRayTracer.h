@@ -51,11 +51,29 @@ namespace rt
 
 		public:
 			virtual bool	Intersects( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, float& t ) const = 0;
-			//virtual bool	CheckIntersection( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, const float rayPower, const vector<Light>& lights, const vector<shared_ptr<Shape>>& shapes, rt::Vec3& rayColor ) const = 0;
 			virtual bool	Hit( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, const float t, const float rayPower, const vector<Light>& lights, const vector<shared_ptr<Shape>>& shapes, rt::Vec3& rayColor ) const = 0;
 
 		protected:
 			Shape( const rt::Vec3 color, const float reflectivity );
+		};
+
+
+
+
+		class Sphere : public Shape
+		{
+		public:
+			const rt::Vec3	origin;
+			const float		vectorLengthSquared;
+			const float		radius;
+			const float		radiusSquared;
+
+		public:
+			bool	Intersects( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, float& t ) const;
+			bool	Hit( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, const float t, const float rayPower, const vector<Light>& lights, const vector<shared_ptr<Shape>>& shapes, rt::Vec3& rayColor ) const;
+
+		public:
+			Sphere( const rt::Vec3 origin, const float radius, const rt::Vec3 color, const float reflectivity );
 		};
 
 
@@ -73,31 +91,10 @@ namespace rt
 
 		public:
 			bool	Intersects( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, float& t ) const;
-			//bool	CheckIntersection( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, const float rayPower, const vector<Light>& lights, const vector<shared_ptr<Shape>>& shapes, rt::Vec3& rayColor ) const;
 			bool	Hit( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, const float t, const float rayPower, const vector<Light>& lights, const vector<shared_ptr<Shape>>& shapes, rt::Vec3& rayColor ) const;
 
 		public:
 			Triangle( const rt::Vec3 vert0, const rt::Vec3 vert1, const rt::Vec3 vert2, const rt::Vec3 color, const float reflectivity );
-		};
-
-
-
-
-		class Sphere : public Shape
-		{
-		public:
-			const rt::Vec3	origin;
-			const float		vectorLengthSquared;
-			const float		radius;
-			const float		radiusSquared;
-
-		public:
-			bool	Intersects( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, float& t ) const;
-			//bool	CheckIntersection( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, const float rayPower, const vector<Light>& lights, const vector<shared_ptr<Shape>>& shapes, rt::Vec3& rayColor ) const;
-			bool	Hit( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, const float t, const float rayPower, const vector<Light>& lights, const vector<shared_ptr<Shape>>& shapes, rt::Vec3& rayColor ) const;
-
-		public:
-			Sphere( const rt::Vec3 origin, const float radius, const rt::Vec3 color, const float reflectivity );
 		};
 
 

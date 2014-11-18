@@ -2,6 +2,7 @@
 #define RT_MATH_H
 
 #include "rtVec3.h"
+#include <cmath>
 
 namespace rt
 {

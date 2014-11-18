@@ -1,7 +1,5 @@
 #include "rtMath.h"
 
-#include <cmath>
-
 rt::Vec3 rt::CrossProduct( const rt::Vec3& vecA, const rt::Vec3& vecB )
 {
 	return rt::Vec3( vecA.y * vecB.z - vecA.z * vecB.y,
