@@ -1,7 +1,7 @@
 #include "rtRayTracer.h"
 #include "rtMath.h"
 
-bool rt::RayTracer::Sphere::Intersects( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, float& t ) const
+bool rt::RayTracer::Sphere::Intersects( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, float& depth ) const
 {
 	rt::Vec3 temp = rayOrigin - origin;
 
@@ -13,7 +13,7 @@ bool rt::RayTracer::Sphere::Intersects( const rt::Vec3& rayOrigin, const rt::Vec
 	if ( discriminant > 0.0f )
 	{
 		discriminant = sqrt( discriminant );
-		t = ( -b - discriminant ) / ( 2.0f * a );
+		depth = ( -b - discriminant ) / ( 2.0f * a );
 		return true;
 	}
 	else
@@ -22,9 +22,9 @@ bool rt::RayTracer::Sphere::Intersects( const rt::Vec3& rayOrigin, const rt::Vec
 	}
 }
 
-bool rt::RayTracer::Sphere::Hit( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, const float t, const float rayPower, const vector<Light>& lights, const vector<shared_ptr<Shape>>& shapes, rt::Vec3& rayColor ) const
+bool rt::RayTracer::Sphere::Hit( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, const float depth, const float rayPower, const vector<Light>& lights, const vector<shared_ptr<Shape>>& shapes, rt::Vec3& rayColor ) const
 {
-	rt::Vec3 intersection = rayOrigin + rayVector * t;
+	rt::Vec3 intersection = rayOrigin + rayVector * depth;
 	rt::Vec3 normal = ( intersection - origin ).Unit();
 
 	for ( auto light : lights )
@@ -38,8 +38,8 @@ bool rt::RayTracer::Sphere::Hit( const rt::Vec3& rayOrigin, const rt::Vec3& rayV
 			{
 				if ( !( id == shape->id ) )
 				{
-					float tempT;
-					if ( shape->Intersects( intersection, lightVec, tempT ) )
+					float tempDepth;
+					if ( shape->Intersects( intersection, lightVec, tempDepth ) )
 					{
 						occluded = true;
 						break;
