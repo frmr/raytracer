@@ -15,7 +15,7 @@ bool rt::RayTracer::Triangle::Intersects( const rt::Vec3& rayOrigin, const rt::V
 	rt::Vec3 d = rayOrigin - v0;
 	float b1 = rt::DotProduct( d, s1 ) * invDivisor;
 
-	if( b1 < 0.0f || b1 > 1.0f )
+	if( b1 <= 0.0f || b1 > 1.0f )
 	{
 		return false;
 	}
@@ -24,7 +24,7 @@ bool rt::RayTracer::Triangle::Intersects( const rt::Vec3& rayOrigin, const rt::V
 
 	float b2 = rt::DotProduct( rayVector, s2 ) * invDivisor;
 
-	if( b2 < 0.0 || b1 + b2 > 1.0f )
+	if( b2 <= 0.0f || b1 + b2 > 1.0f )
 	{
 		return false;
 	}
@@ -32,15 +32,6 @@ bool rt::RayTracer::Triangle::Intersects( const rt::Vec3& rayOrigin, const rt::V
 	depth = rt::DotProduct( v02, s2 ) * invDivisor;
 
 	return ( depth > 0.0f ) ? true : false;
-	{
-
-	}
-
-//	if( r.trunc( t ) )
-//	{
-//		i.set(this,ray.getPointAt(t),normal,b1,b2);
-//		return true;
-//	}
 }
 
 bool rt::RayTracer::Triangle::Hit( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, const float depth, const float rayPower, const vector<Light>& lights, const vector<shared_ptr<Shape>>& shapes, rt::Vec3& rayColor ) const
