@@ -60,7 +60,7 @@ bool rt::RayTracer::Triangle::Hit( const rt::Vec3& rayOrigin, const rt::Vec3& ra
 			}
 			if ( !occluded )
 			{
-				rayColor += color * rt::DotProduct( normal, ( light.origin - intersection ).Unit() );
+				rayColor += color * rt::DotProduct( normal, lightVec );
 			}
 		}
 	}

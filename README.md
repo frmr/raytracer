@@ -12,3 +12,7 @@ Float used for speed boost on 32-bit systems (maybe don't mention this)
 Sample() method takes advantage of high parallelisation possibilities.
 Independence from traditional graphics APIs allows float colours.
 American spelling of colour used because of my intention to open source the project.
+
+Test different ray stopping methods (depth vs power)
+Test different anti-aliasing approaches (multi-sampling vs scaling)
+Test impact of additional lights

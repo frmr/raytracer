@@ -45,11 +45,10 @@ bool rt::RayTracer::Sphere::Hit( const rt::Vec3& rayOrigin, const rt::Vec3& rayV
 						break;
 					}
 				}
-
 			}
 			if ( !occluded )
 			{
-				rayColor += color * rt::DotProduct( normal, ( light.origin - intersection ).Unit() );
+				rayColor += color * rt::DotProduct( normal, lightVec );
 			}
 		}
 	}

@@ -48,6 +48,8 @@ namespace rt
 			const int		id;
 			const rt::Vec3	color;
 			const float		reflectivity;
+			//specular
+			//opacity
 
 		public:
 			virtual bool	Intersects( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, float& depth ) const = 0;

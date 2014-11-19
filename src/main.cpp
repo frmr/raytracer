@@ -38,6 +38,7 @@ void SetupScene( rt::RayTracer& rayTracer )
 	rayTracer.AddTriangle( rt::Vec3( 20.0f, 20.0f, 25.0f ), rt::Vec3( 20.0f, -20.0f, 25.0f ), rt::Vec3( -20.0f, -20.0f, 25.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 0.5f );
 
 	rayTracer.AddLight( rt::Vec3( 0.0f, 5.0f, 5.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 1.0f );
+	//rayTracer.AddLight( rt::Vec3( 0.0f, -5.0f, 5.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 1.0f );
 }
 
 void SampleRayTracer( const rt::RayTracer& rayTracer, const int width, const int height, rt::Vec3& rayVector, int& x, int& y, BMP& output )
@@ -65,6 +66,7 @@ void SampleRayTracer( const rt::RayTracer& rayTracer, const int width, const int
 
 		rt::Vec3 sampleColor;
 		rayTracer.Sample( myVector, sampleColor );
+		sampleColor = sampleColor.UnitCap();
 		rayLock.lock();
 			output( myX, myY )->Red = (int) ( sampleColor.x * 255.0f );
 			output( myX, myY )->Green = (int) ( sampleColor.y * 255.0f );

@@ -14,6 +14,7 @@ namespace rt
 		float			Length() const;
 		Vec3			Reverse() const;
 		Vec3			Unit() const;
+		Vec3			UnitCap() const;
 
 		Vec3			operator+( const Vec3& rhs ) const;
 		Vec3			operator-( const Vec3& rhs ) const;

@@ -19,6 +19,11 @@ rt::Vec3 rt::Vec3::Unit() const
 	return rt::Vec3( x / length, y / length, z / length );
 }
 
+rt::Vec3 rt::Vec3::UnitCap() const
+{
+	return rt::Vec3( ( x > 1.0f ) ? 1.0f : x, ( y > 1.0f ) ? 1.0f : y, ( z > 1.0f ) ? 1.0f : z );
+}
+
 rt::Vec3 rt::Vec3::operator+( const Vec3& rhs ) const
 {
 	return rt::Vec3( x + rhs.x, y + rhs.y, z + rhs.z );
