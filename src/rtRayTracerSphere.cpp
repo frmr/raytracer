@@ -29,10 +29,10 @@ bool rt::RayTracer::Sphere::Hit( const rt::Vec3& rayOrigin, const rt::Vec3& rayV
 
 	for ( auto light : lights )
 	{
-		float dotLight = rt::DotProduct( normal, ( light.origin - intersection ).Unit() );
+		rt::Vec3 lightVec = ( light.origin - intersection ).Unit();
+		float dotLight = rt::DotProduct( normal, lightVec );
 		if ( dotLight > 0.0f )
 		{
-			rt::Vec3 lightVec = ( light.origin - intersection ).Unit();
 			bool occluded = false;
 			for ( const auto& shape : shapes )
 			{
@@ -53,7 +53,7 @@ bool rt::RayTracer::Sphere::Hit( const rt::Vec3& rayOrigin, const rt::Vec3& rayV
 			}
 		}
 	}
-	return true;
+    return true;
 }
 
 rt::RayTracer::Sphere::Sphere( const rt::Vec3 origin, const float radius, const rt::Vec3 color, const float reflectivity )

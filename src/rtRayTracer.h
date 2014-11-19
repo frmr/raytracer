@@ -102,7 +102,7 @@ namespace rt
 
 	private:
 		vector<Light>				lights;
-		vector<shared_ptr<Shape>>	shapes; //use unique_ptr in C++14
+		vector<shared_ptr<Shape>>	shapes;
 
 	public:
 		bool	AddLight( const rt::Vec3 origin, const rt::Vec3 color, const float intensity );

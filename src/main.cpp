@@ -27,6 +27,9 @@ void SetupScene( rt::RayTracer& rayTracer )
 	rayTracer.AddSphere( rt::Vec3( 0.0f, 5.0f, 20.0f ), 1.0f, rt::Vec3( 1.0f, 0.0f, 1.0f ), 0.5f );
 	rayTracer.AddSphere( rt::Vec3( 5.0f, 0.0f, 20.0f ), 1.0f, rt::Vec3( 0.0f, 1.0f, 1.0f ), 0.5f );
 	rayTracer.AddSphere( rt::Vec3( 3.0f, 3.0f, 6.0f ), 1.0f, rt::Vec3( 0.0f, 1.0f, 1.0f ), 0.5f );
+
+	rayTracer.AddTriangle( rt::Vec3( -10.0f, 10.0f, 22.0f ), rt::Vec3( 10.0f, 10.0f, 22.0f ), rt::Vec3( -10.0f, -10.0f, 22.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 0.5f );
+
 	rayTracer.AddLight( rt::Vec3( 5.0f, 5.0f, 5.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 1.0f );
 }
 
@@ -107,7 +110,7 @@ int main( const int argc, char* argv[] )
 	BMP output;
 	output.SetSize( width, height );
 
-	const int maxThreads = 4;
+	const int maxThreads = 1;
 	vector<std::thread> threads;
 
 	int x = 0;

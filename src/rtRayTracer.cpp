@@ -29,14 +29,20 @@ rt::RayTracer::rtError rt::RayTracer::Sample( const rt::Vec3& rayVector, rt::Vec
 	float				closestDepth = std::numeric_limits<float>::max();
 	shared_ptr<Shape>	closestShape = nullptr;
 
-	sampleColor = Vec3();
-
 	//find closest intersection
 	for ( auto shape : shapes )
 	{
 		float tempDepth;
 		if ( shape->Intersects( rayOrigin, rayVector, tempDepth ) )
 		{
+//			if ( shape->id == 2 )
+//			{
+//				std::cout << "Blue\t" << tempDepth << std::endl;
+//			}
+//			else if ( shape->id == 6 )
+//			{
+//				std::cout << "Tri\t" << tempDepth << std::endl;
+//			}
 			if ( tempDepth < closestDepth )
 			{
 				closestDepth = tempDepth;
@@ -44,6 +50,8 @@ rt::RayTracer::rtError rt::RayTracer::Sample( const rt::Vec3& rayVector, rt::Vec
 			}
 		}
 	}
+
+	sampleColor = Vec3();
 
 	//cast ray to closest shape
 	if ( closestShape != nullptr )
