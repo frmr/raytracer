@@ -14,7 +14,7 @@ bool rt::RayTracer::Sphere::Intersects( const rt::Vec3& rayOrigin, const rt::Vec
 	{
 		discriminant = sqrt( discriminant );
 		depth = ( -b - discriminant ) / ( 2.0f * a );
-		return true;
+		return ( depth > 0.0f ) ? true : false;
 	}
 	else
 	{

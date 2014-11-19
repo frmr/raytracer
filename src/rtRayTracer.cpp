@@ -35,14 +35,6 @@ rt::RayTracer::rtError rt::RayTracer::Sample( const rt::Vec3& rayVector, rt::Vec
 		float tempDepth;
 		if ( shape->Intersects( rayOrigin, rayVector, tempDepth ) )
 		{
-//			if ( shape->id == 2 )
-//			{
-//				std::cout << "Blue\t" << tempDepth << std::endl;
-//			}
-//			else if ( shape->id == 6 )
-//			{
-//				std::cout << "Tri\t" << tempDepth << std::endl;
-//			}
 			if ( tempDepth < closestDepth )
 			{
 				closestDepth = tempDepth;
