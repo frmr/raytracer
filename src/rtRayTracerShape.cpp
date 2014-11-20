@@ -11,7 +11,7 @@ bool rt::RayTracer::Shape::UpdateColor( const rt::Vec3& rayVector, const rt::Vec
 
 rt::RayTracer::Shape::Shape()
 	:	id( idCounter++ ),
-		ambient( 0.5f, 0.5f, 0.5f ),
+		ambient( 0.5f, 0.0f, 0.0f ),
 		diffuse( 0.5f, 0.5f, 0.5f ),
 		specular( 0.5f, 0.5f, 0.5f ),
 		shininess( 0.0f )

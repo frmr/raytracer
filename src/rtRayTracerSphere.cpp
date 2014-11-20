@@ -54,11 +54,13 @@ bool rt::RayTracer::Sphere::Hit( const rt::Vec3& rayOrigin, const rt::Vec3& rayV
 			if ( !occluded )
 			{
 				diffuseAddition += light.color * diffuse * dotLight;
-				//rayColor += diffuse * rt::DotProduct( normal, lightVector );
+				rt::Vec3 reflectionVector = normal * 2.0f * rt::DotProduct( lightVector, normal ) - lightVector;
+				specularAddition += light.color * specular * pow( rt::DotProduct( reflectionVector, rayVector.Reverse() ), 250.0f );
 			}
 		}
 	}
 	rayColor += diffuseAddition; //* diffuse paramater
+	rayColor += specularAddition;
     return true;
 }
 
