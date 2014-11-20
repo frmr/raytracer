@@ -60,17 +60,24 @@ bool rt::RayTracer::Triangle::Hit( const rt::Vec3& rayOrigin, const rt::Vec3& ra
 			}
 			if ( !occluded )
 			{
-				rayColor += color * rt::DotProduct( normal, lightVec );
+				rayColor += diffuse * rt::DotProduct( normal, lightVec );
 			}
 		}
 	}
     return true;
 }
 
-rt::RayTracer::Triangle::Triangle( const rt::Vec3 v0, const rt::Vec3 v1, const rt::Vec3 v2, const rt::Vec3 color, const float reflectivity )
-	:	Shape( color, reflectivity ),
+rt::RayTracer::Triangle::Triangle( const rt::Vec3 v0, const rt::Vec3 v1, const rt::Vec3 v2 )
+	:	Shape(),
 		v0( v0 ), v1( v1 ), v2( v2 ),
-        //v01( ( v1 - v0 ).Unit() ), v02( ( v2 - v0 ).Unit() ),
+		v01( ( v1 - v0 ) ), v02( ( v2 - v0 ) ),
+        normal( rt::CrossProduct( v01.Unit(), v02.Unit() ).Unit() )
+{
+}
+
+rt::RayTracer::Triangle::Triangle( const rt::Vec3 v0, const rt::Vec3 v1, const rt::Vec3 v2, const rt::Vec3 ambient, const rt::Vec3 diffuse, const rt::Vec3 specular, const float shininess )
+	:	Shape( ambient, diffuse, specular, shininess ),
+		v0( v0 ), v1( v1 ), v2( v2 ),
         v01( ( v1 - v0 ) ), v02( ( v2 - v0 ) ),
         normal( rt::CrossProduct( v01.Unit(), v02.Unit() ).Unit() )
 {

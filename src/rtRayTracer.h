@@ -31,10 +31,9 @@ namespace rt
 		public:
 			const rt::Vec3 origin;
 			const rt::Vec3 color;
-			const float intensity;
 
 		public:
-			Light( const rt::Vec3 origin, const rt::Vec3 color, const float intensity );
+			Light( const rt::Vec3 origin, const rt::Vec3 color );
 		};
 
 
@@ -46,17 +45,18 @@ namespace rt
 			static int		idCounter;
 		public:
 			const int		id;
-			const rt::Vec3	color;
-			const float		reflectivity;
-			//specular
-			//opacity
+			const rt::Vec3	ambient;
+			const rt::Vec3	diffuse;
+			const rt::Vec3	specular;
+			const float		shininess;
 
 		public:
 			virtual bool	Intersects( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, float& depth ) const = 0;
 			virtual bool	Hit( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, const float depth, const float rayPower, const vector<Light>& lights, const vector<shared_ptr<Shape>>& shapes, rt::Vec3& rayColor ) const = 0;
 
 		protected:
-			Shape( const rt::Vec3 color, const float reflectivity );
+			Shape();
+			Shape( const rt::Vec3 ambient, const rt::Vec3 diffuse, const rt::Vec3 specular, const float shininess );
 		};
 
 
@@ -66,7 +66,6 @@ namespace rt
 		{
 		public:
 			const rt::Vec3	origin;
-			const float		vectorLengthSquared;
 			const float		radius;
 			const float		radiusSquared;
 
@@ -75,7 +74,8 @@ namespace rt
 			bool	Hit( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, const float depth, const float rayPower, const vector<Light>& lights, const vector<shared_ptr<Shape>>& shapes, rt::Vec3& rayColor ) const;
 
 		public:
-			Sphere( const rt::Vec3 origin, const float radius, const rt::Vec3 color, const float reflectivity );
+			Sphere( const rt::Vec3 origin, const float radius );
+			Sphere( const rt::Vec3 origin, const float radius, const rt::Vec3 ambient, const rt::Vec3 diffuse, const rt::Vec3 specular, const float shininess );
 		};
 
 
@@ -96,7 +96,8 @@ namespace rt
 			bool	Hit( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, const float depth, const float rayPower, const vector<Light>& lights, const vector<shared_ptr<Shape>>& shapes, rt::Vec3& rayColor ) const;
 
 		public:
-			Triangle( const rt::Vec3 v0, const rt::Vec3 v1, const rt::Vec3 v2, const rt::Vec3 color, const float reflectivity );
+			Triangle( const rt::Vec3 v0, const rt::Vec3 v1, const rt::Vec3 v2 );
+			Triangle( const rt::Vec3 v0, const rt::Vec3 v1, const rt::Vec3 v2, const rt::Vec3 ambient, const rt::Vec3 diffuse, const rt::Vec3 specular, const float shininess );
 		};
 
 
@@ -107,9 +108,13 @@ namespace rt
 		vector<shared_ptr<Shape>>	shapes;
 
 	public:
-		bool	AddLight( const rt::Vec3 origin, const rt::Vec3 color, const float intensity );
-		bool	AddTriangle( const rt::Vec3 vert0, const rt::Vec3 vert1, const rt::Vec3 vert2, const rt::Vec3 color, const float reflectivity );
-		bool	AddSphere( const rt::Vec3 origin, const float radius, const rt::Vec3 color, const float reflectivity );
+		bool	AddLight( const rt::Vec3 origin, const rt::Vec3 color );
+
+		bool	AddTriangle( const rt::Vec3 vert0, const rt::Vec3 vert1, const rt::Vec3 vert2 );
+		bool	AddTriangle( const rt::Vec3 vert0, const rt::Vec3 vert1, const rt::Vec3 vert2, const rt::Vec3 ambient, const rt::Vec3 diffuse, const rt::Vec3 specular, const float shininess );
+
+		bool	AddSphere( const rt::Vec3 origin, const float radius );
+		bool	AddSphere( const rt::Vec3 origin, const float radius, const rt::Vec3 ambient, const rt::Vec3 diffuse, const rt::Vec3 specular, const float shininess );
 		rtError Sample( const rt::Vec3& rayVector, rt::Vec3& sampleColor ) const;
 
 	public:

@@ -48,15 +48,25 @@ bool rt::RayTracer::Sphere::Hit( const rt::Vec3& rayOrigin, const rt::Vec3& rayV
 			}
 			if ( !occluded )
 			{
-				rayColor += color * rt::DotProduct( normal, lightVec );
+				rayColor += diffuse * rt::DotProduct( normal, lightVec );
 			}
 		}
 	}
     return true;
 }
 
-rt::RayTracer::Sphere::Sphere( const rt::Vec3 origin, const float radius, const rt::Vec3 color, const float reflectivity )
-	:	Shape( color, reflectivity ),
-		origin( origin ), vectorLengthSquared( origin.Length() * origin.Length() ), radius( radius ), radiusSquared( radius * radius )
+rt::RayTracer::Sphere::Sphere( const rt::Vec3 origin, const float radius )
+	:	Shape(),
+		origin( origin ),
+		radius( radius ),
+		radiusSquared( radius * radius )
+{
+}
+
+rt::RayTracer::Sphere::Sphere( const rt::Vec3 origin, const float radius, const rt::Vec3 ambient, const rt::Vec3 diffuse, const rt::Vec3 specular, const float shininess )
+	:	Shape( ambient, diffuse, specular, shininess ),
+		origin( origin ),
+		radius( radius ),
+		radiusSquared( radius * radius )
 {
 }
