@@ -1,6 +1,13 @@
 #include "rtRayTracer.h"
+#include "rtMath.h"
 
 int rt::RayTracer::Shape::idCounter = 0;
+
+bool rt::RayTracer::Shape::UpdateColor( const rt::Vec3& rayVector, const rt::Vec3& lightVector, const rt::Vec3& surfaceNormal, rt::Vec3& rayColor ) const
+{
+	rayColor += diffuse * rt::DotProduct( surfaceNormal, lightVector );
+	return true;
+}
 
 rt::RayTracer::Shape::Shape()
 	:	id( idCounter++ ),

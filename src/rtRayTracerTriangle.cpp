@@ -38,10 +38,14 @@ bool rt::RayTracer::Triangle::Hit( const rt::Vec3& rayOrigin, const rt::Vec3& ra
 {
 	rt::Vec3 intersection = rayOrigin + rayVector * depth;
 
+	rt::Vec3 ambientAddition;
+	rt::Vec3 diffuseAddition;
+	rt::Vec3 specularAddition;
+
 	for ( auto light : lights )
 	{
-		rt::Vec3 lightVec = ( light.origin - intersection ).Unit();
-		float dotLight = rt::DotProduct( normal, lightVec );
+		rt::Vec3 lightVector = ( light.origin - intersection ).Unit();
+		float dotLight = rt::DotProduct( normal, lightVector );
 		if ( dotLight > 0.0f )
 		{
 			bool occluded = false;
@@ -50,7 +54,7 @@ bool rt::RayTracer::Triangle::Hit( const rt::Vec3& rayOrigin, const rt::Vec3& ra
 				if ( !( id == shape->id ) )
 				{
 					float tempDepth;
-					if ( shape->Intersects( intersection, lightVec, tempDepth ) )
+					if ( shape->Intersects( intersection, lightVector, tempDepth ) )
 					{
 						occluded = true;
 						break;
@@ -60,10 +64,12 @@ bool rt::RayTracer::Triangle::Hit( const rt::Vec3& rayOrigin, const rt::Vec3& ra
 			}
 			if ( !occluded )
 			{
-				rayColor += diffuse * rt::DotProduct( normal, lightVec );
+				diffuseAddition += light.color * diffuse * dotLight;
+				//rayColor += diffuse * rt::DotProduct( normal, lightVector );
 			}
 		}
 	}
+	rayColor += diffuseAddition; //* diffuse paramater
     return true;
 }
 

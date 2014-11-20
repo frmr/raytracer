@@ -50,6 +50,9 @@ namespace rt
 			const rt::Vec3	specular;
 			const float		shininess;
 
+		protected:
+			bool			UpdateColor( const rt::Vec3& rayVector, const rt::Vec3& lightVector, const rt::Vec3& surfaceNormal, rt::Vec3& rayColor ) const;
+
 		public:
 			virtual bool	Intersects( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, float& depth ) const = 0;
 			virtual bool	Hit( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, const float depth, const float rayPower, const vector<Light>& lights, const vector<shared_ptr<Shape>>& shapes, rt::Vec3& rayColor ) const = 0;

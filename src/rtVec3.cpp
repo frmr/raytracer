@@ -39,6 +39,11 @@ rt::Vec3 rt::Vec3::operator*( const float& rhs ) const
 	return rt::Vec3( x * rhs, y * rhs, z * rhs );
 }
 
+rt::Vec3 rt::Vec3::operator*( const Vec3& rhs ) const
+{
+	return rt::Vec3( x * rhs.x, y * rhs.y, z * rhs.z );
+}
+
 rt::Vec3 rt::Vec3::operator/( const float& rhs ) const
 {
 	return rt::Vec3( x / rhs, y / rhs, z / rhs );
@@ -65,6 +70,14 @@ rt::Vec3& rt::Vec3::operator*=( const float& rhs )
 	x *= rhs;
 	y *= rhs;
 	z *= rhs;
+	return *this;
+}
+
+rt::Vec3& rt::Vec3::operator*=( const rt::Vec3& rhs )
+{
+	x *= rhs.x;
+	y *= rhs.y;
+	z *= rhs.z;
 	return *this;
 }
 
