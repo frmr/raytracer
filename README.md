@@ -16,3 +16,5 @@ American spelling of colour used because of my intention to open source the proj
 Test different ray stopping methods (depth vs power)
 Test different anti-aliasing approaches (multi-sampling vs scaling)
 Test impact of additional lights
+
+Dithering

@@ -55,7 +55,7 @@ namespace rt
 
 		public:
 			virtual bool	Intersects( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, float& depth ) const = 0;
-			virtual bool	Hit( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, const float depth, const float rayPower, const vector<Light>& lights, const vector<shared_ptr<Shape>>& shapes, rt::Vec3& rayColor ) const = 0;
+			virtual bool	Hit( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, const float depth, float rayPower, const vector<Light>& lights, const vector<shared_ptr<Shape>>& shapes, rt::Vec3& rayColor ) const = 0;
 
 		protected:
 			Shape();
@@ -74,7 +74,7 @@ namespace rt
 
 		public:
 			bool	Intersects( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, float& depth ) const;
-			bool	Hit( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, const float depth, const float rayPower, const vector<Light>& lights, const vector<shared_ptr<Shape>>& shapes, rt::Vec3& rayColor ) const;
+			bool	Hit( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, const float depth, float rayPower, const vector<Light>& lights, const vector<shared_ptr<Shape>>& shapes, rt::Vec3& rayColor ) const;
 
 		public:
 			Sphere( const rt::Vec3 origin, const float radius );
@@ -96,7 +96,7 @@ namespace rt
 
 		public:
 			bool	Intersects( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, float& depth ) const;
-			bool	Hit( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, const float depth, const float rayPower, const vector<Light>& lights, const vector<shared_ptr<Shape>>& shapes, rt::Vec3& rayColor ) const;
+			bool	Hit( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, const float depth, float rayPower, const vector<Light>& lights, const vector<shared_ptr<Shape>>& shapes, rt::Vec3& rayColor ) const;
 
 		public:
 			Triangle( const rt::Vec3 v0, const rt::Vec3 v1, const rt::Vec3 v2 );

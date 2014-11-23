@@ -1,5 +1,6 @@
 #include "rtRayTracer.h"
 #include "rtMath.h"
+#include <limits>
 
 bool rt::RayTracer::Triangle::Intersects( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, float& depth ) const
 {
@@ -34,7 +35,7 @@ bool rt::RayTracer::Triangle::Intersects( const rt::Vec3& rayOrigin, const rt::V
 	return ( depth > 0.0f ) ? true : false;
 }
 
-bool rt::RayTracer::Triangle::Hit( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, const float depth, const float rayPower, const vector<Light>& lights, const vector<shared_ptr<Shape>>& shapes, rt::Vec3& rayColor ) const
+bool rt::RayTracer::Triangle::Hit( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, const float depth, float rayPower, const vector<Light>& lights, const vector<shared_ptr<Shape>>& shapes, rt::Vec3& rayColor ) const
 {
 	rt::Vec3 intersection = rayOrigin + rayVector * depth;
 
@@ -72,6 +73,41 @@ bool rt::RayTracer::Triangle::Hit( const rt::Vec3& rayOrigin, const rt::Vec3& ra
 	}
 	rayColor += diffuseAddition; //* diffuse paramater
 	rayColor += specularAddition;
+
+	rayPower -= 1.0f - shininess;
+
+	if ( rayPower > 0.0f )
+	{
+		rt::Vec3 reflectedRayVector = rayVector - normal * 2.0f * rt::DotProduct( rayVector, normal );
+
+		float				closestDepth = std::numeric_limits<float>::max();
+		shared_ptr<Shape>	closestShape = nullptr;
+
+		//find closest intersection
+		for ( auto shape : shapes )
+		{
+			if ( shape->id != id )
+			{
+				float tempDepth;
+				if ( shape->Intersects( intersection, reflectedRayVector, tempDepth ) )
+				{
+					if ( tempDepth < closestDepth )
+					{
+						closestDepth = tempDepth;
+						closestShape = shape;
+					}
+				}
+			}
+
+		}
+
+		//cast ray to closest shape
+		if ( closestShape != nullptr )
+		{
+			closestShape->Hit( intersection, reflectedRayVector, closestDepth, rayPower, lights, shapes, rayColor );
+		}
+	}
+
     return true;
 }
 
