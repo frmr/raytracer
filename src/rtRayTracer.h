@@ -118,6 +118,7 @@ namespace rt
 
 		bool	AddSphere( const rt::Vec3 origin, const float radius );
 		bool	AddSphere( const rt::Vec3 origin, const float radius, const rt::Vec3 ambient, const rt::Vec3 diffuse, const rt::Vec3 specular, const float shininess );
+
 		rtError Sample( const rt::Vec3& rayVector, rt::Vec3& sampleColor ) const;
 
 	public:
