@@ -87,7 +87,7 @@ void SampleRayTracer( const rt::RayTracer& rayTracer, const int width, const int
 //			buffer( myX, myY )->Red = (int) ( sampleColor.x * 255.0f );
 //			buffer( myX, myY )->Green = (int) ( sampleColor.y * 255.0f );
 //			buffer( myX, myY )->Blue = (int) ( sampleColor.z * 255.0f );
-			*(buffer( myX, myY )) = sampleColor.UnitCap();
+			*(buffer( myX, myY )) = sampleColor;
 		bufferLock.unlock();
 	}
 }
@@ -168,9 +168,10 @@ int main( const int argc, char* argv[] )
 	{
 		for ( int y = 0; y < height; ++y )
 		{
-			output(x,y)->Red = (int) ( buffer(x,y)->x * 255.0f );
-			output(x,y)->Green = (int) ( buffer(x,y)->y * 255.0f );
-			output(x,y)->Blue = (int) ( buffer(x,y)->z * 255.0f );
+			rt::Vec3 clipped = buffer(x,y)->UnitClip();
+			output(x,y)->Red = (int) ( clipped.x * 255.0f );
+			output(x,y)->Green = (int) ( clipped.y * 255.0f );
+			output(x,y)->Blue = (int) ( clipped.z * 255.0f );
 		}
 	}
 

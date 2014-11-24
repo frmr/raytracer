@@ -56,9 +56,10 @@ namespace rt
 
 	public:
 		ScreenBuffer( const int width, const int height )
-			:	width( width ),
-				height( height ),
-				buffer( width, vector<rt::Vec3>( height, rt::Vec3() ) )
+			:	buffer( width, vector<rt::Vec3>( height, rt::Vec3() ) ),
+				width( width ),
+				height( height )
+
 		{
 		}
 

@@ -20,3 +20,4 @@ Test impact of additional lights
 Dithering
 Refraction
 Anti-aliasing
+HDR, floats can go above 1.0, but get clipped to 1.0 AFTER dithering
