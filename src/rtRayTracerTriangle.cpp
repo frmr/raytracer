@@ -78,34 +78,7 @@ bool rt::RayTracer::Triangle::Hit( const rt::Vec3& rayOrigin, const rt::Vec3& ra
 
 	if ( rayPower > 0.0f )
 	{
-		rt::Vec3 reflectedRayVector = rayVector - normal * 2.0f * rt::DotProduct( rayVector, normal );
-
-		float				closestDepth = std::numeric_limits<float>::max();
-		shared_ptr<Shape>	closestShape = nullptr;
-
-		//find closest intersection
-		for ( auto shape : shapes )
-		{
-			if ( shape->id != id )
-			{
-				float tempDepth;
-				if ( shape->Intersects( intersection, reflectedRayVector, tempDepth ) )
-				{
-					if ( tempDepth < closestDepth )
-					{
-						closestDepth = tempDepth;
-						closestShape = shape;
-					}
-				}
-			}
-
-		}
-
-		//cast ray to closest shape
-		if ( closestShape != nullptr )
-		{
-			closestShape->Hit( intersection, reflectedRayVector, closestDepth, rayPower, lights, shapes, rayColor );
-		}
+		SpawnReflectionRay( intersection, rayVector, normal, rayPower, lights, shapes, rayColor );
 	}
 
     return true;

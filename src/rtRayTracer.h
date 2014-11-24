@@ -51,7 +51,8 @@ namespace rt
 			const float		shininess;
 
 		protected:
-			bool			UpdateColor( const rt::Vec3& rayVector, const rt::Vec3& lightVector, const rt::Vec3& surfaceNormal, rt::Vec3& rayColor ) const;
+			void			SpawnReflectionRay( const rt::Vec3& intersection, const rt::Vec3& rayVector, const rt::Vec3& normal, const float rayPower, const vector<Light>& lightsRef, const vector<shared_ptr<Shape>>& shapesRef, rt::Vec3& rayColor ) const;
+			bool			UpdateColor( const rt::Vec3& rayVector, const rt::Vec3& lightVector, const rt::Vec3& surfaceNormal, rt::Vec3& rayColor ) const; //TODO: Remove?
 
 		public:
 			virtual bool	Intersects( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, float& depth ) const = 0;
