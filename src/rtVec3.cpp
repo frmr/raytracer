@@ -13,6 +13,11 @@ rt::Vec3 rt::Vec3::Reverse() const
 	return rt::Vec3( -x, -y, -z );
 }
 
+rt::Vec3 rt::Vec3::Round() const
+{
+	return rt::Vec3( std::round( x ), std::round( y ), std::round( z ) );
+}
+
 rt::Vec3 rt::Vec3::Unit() const
 {
 	float length = sqrt( x * x + y * y + z * z );

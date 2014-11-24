@@ -13,6 +13,7 @@ namespace rt
 	public:
 		float			Length() const;
 		Vec3			Reverse() const;
+		Vec3			Round() const;
 		Vec3			Unit() const;
 		Vec3			UnitCap() const;
 

@@ -18,3 +18,5 @@ Test different anti-aliasing approaches (multi-sampling vs scaling)
 Test impact of additional lights
 
 Dithering
+Refraction
+Anti-aliasing

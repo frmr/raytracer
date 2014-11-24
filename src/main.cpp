@@ -12,6 +12,7 @@
 
 #include "rtMath.h"
 #include "rtRayTracer.h"
+#include "rtScreenBuffer.h"
 #include "rtVec3.h"
 
 using std::cout;
@@ -19,6 +20,7 @@ using std::endl;
 using std::string;
 
 std::mutex rayLock;
+std::mutex bufferLock;
 
 void SetupScene( rt::RayTracer& rayTracer )
 {
@@ -54,7 +56,8 @@ void SetupScene( rt::RayTracer& rayTracer )
 	//rayTracer.AddLight( rt::Vec3( 0.0f, -5.0f, 5.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 1.0f );
 }
 
-void SampleRayTracer( const rt::RayTracer& rayTracer, const int width, const int height, rt::Vec3& rayVector, int& x, int& y, BMP& output )
+//void SampleRayTracer( const rt::RayTracer& rayTracer, const int width, const int height, rt::Vec3& rayVector, int& x, int& y, BMP& output )
+void SampleRayTracer( const rt::RayTracer& rayTracer, const int width, const int height, rt::Vec3& rayVector, int& x, int& y, rt::ScreenBuffer& buffer )
 {
 	rt::Vec3 myVector;
 	int myX, myY;
@@ -79,12 +82,13 @@ void SampleRayTracer( const rt::RayTracer& rayTracer, const int width, const int
 
 		rt::Vec3 sampleColor;
 		rayTracer.Sample( myVector, sampleColor );
-		sampleColor = sampleColor.UnitCap();
-		rayLock.lock();
-			output( myX, myY )->Red = (int) ( sampleColor.x * 255.0f );
-			output( myX, myY )->Green = (int) ( sampleColor.y * 255.0f );
-			output( myX, myY )->Blue = (int) ( sampleColor.z * 255.0f );
-		rayLock.unlock();
+		//sampleColor = sampleColor.UnitCap();
+		bufferLock.lock();
+//			buffer( myX, myY )->Red = (int) ( sampleColor.x * 255.0f );
+//			buffer( myX, myY )->Green = (int) ( sampleColor.y * 255.0f );
+//			buffer( myX, myY )->Blue = (int) ( sampleColor.z * 255.0f );
+			*(buffer( myX, myY )) = sampleColor.UnitCap();
+		bufferLock.unlock();
 	}
 }
 
@@ -129,12 +133,16 @@ int main( const int argc, char* argv[] )
 	rt::RayTracer rayTracer;
 	SetupScene( rayTracer );
 
+	rt::ScreenBuffer buffer( width, height );
+
+	//Create output bitmap
 	BMP output;
 	output.SetSize( width, height );
 
 	const int maxThreads = 4;
 	vector<std::thread> threads;
 
+	//Start the timer
 	std::chrono::time_point<std::chrono::system_clock> startTime, endTime;
 	startTime = std::chrono::system_clock::now();
 
@@ -144,7 +152,7 @@ int main( const int argc, char* argv[] )
 
 	for ( int i = 0; i  < maxThreads; ++i )
 	{
-		threads.push_back( std::thread( SampleRayTracer, std::cref(rayTracer), width, height, std::ref( rayVector ), std::ref(x), std::ref(y), std::ref(output) ) );
+		threads.push_back( std::thread( SampleRayTracer, std::cref(rayTracer), width, height, std::ref( rayVector ), std::ref(x), std::ref(y), std::ref(buffer) ) );
 	}
 
 	cout << "Using " << threads.size() << " threads." << endl;
@@ -154,9 +162,21 @@ int main( const int argc, char* argv[] )
 		it->join();
 	}
 
+	buffer.Dither();
+
+	for ( int x = 0; x < width; ++x )
+	{
+		for ( int y = 0; y < height; ++y )
+		{
+			output(x,y)->Red = (int) buffer(x,y)->x;
+			output(x,y)->Green = (int) buffer(x,y)->y;
+			output(x,y)->Blue = (int) buffer(x,y)->z;
+		}
+	}
+
+	//End timer and output render time
 	endTime = std::chrono::system_clock::now();
 	std::chrono::duration<double> elapsed_seconds = endTime - startTime;
-
 	cout << "Rendered in " << elapsed_seconds.count() << " seconds." << endl;
 
 	cout << "Outputting to " << outputFilename << ".bmp" << endl;
