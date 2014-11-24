@@ -168,9 +168,9 @@ int main( const int argc, char* argv[] )
 	{
 		for ( int y = 0; y < height; ++y )
 		{
-			output(x,y)->Red = (int) buffer(x,y)->x;
-			output(x,y)->Green = (int) buffer(x,y)->y;
-			output(x,y)->Blue = (int) buffer(x,y)->z;
+			output(x,y)->Red = (int) ( buffer(x,y)->x * 255.0f );
+			output(x,y)->Green = (int) ( buffer(x,y)->y * 255.0f );
+			output(x,y)->Blue = (int) ( buffer(x,y)->z * 255.0f );
 		}
 	}
 
