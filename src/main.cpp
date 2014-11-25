@@ -65,7 +65,7 @@ void SampleRayTracer( const rt::RayTracer& rayTracer, const int width, const int
 	rayLock.lock();
 	while ( x < width )
 	{
-		myVector = rayVector.Unit();
+		myVector = rayVector;//.Unit();
 		myX = x;
 		myY = y++;
 		rayVector.y--;
@@ -73,21 +73,35 @@ void SampleRayTracer( const rt::RayTracer& rayTracer, const int width, const int
 		if ( y == height )
 		{
 			y = 0;
-			rayVector.y = height / 2.0f - 0.5f;
+			rayVector.y = height / 2.0f;// - 0.5f;
 
 			x++;
 			rayVector.x++;
 		}
 		rayLock.unlock();
 
-		rt::Vec3 sampleColor;
-		rayTracer.Sample( myVector, sampleColor );
-		//sampleColor = sampleColor.UnitCap();
+		//cast multiple rays per pixel
+		rt::Vec3 totalColor;
+		const int sampleDimension = 3;
+		const float sampleIncrement = 1.0f / (float)(sampleDimension + 1);
+		const float myVectorInitialY = myVector.y;
+
+		for ( int xi = 0; xi < sampleDimension; ++xi )
+		{
+			myVector.x += sampleIncrement;
+			for ( int yi = 0; yi < sampleDimension; ++yi )
+			{
+				myVector.y -= sampleIncrement;
+				//myVector = myVector.Unit();
+				rt::Vec3 sampleColor;
+				rayTracer.Sample( myVector.Unit(), sampleColor );
+				totalColor += sampleColor;
+			}
+			myVector.y = myVectorInitialY;
+		}
+
 		bufferLock.lock();
-//			buffer( myX, myY )->Red = (int) ( sampleColor.x * 255.0f );
-//			buffer( myX, myY )->Green = (int) ( sampleColor.y * 255.0f );
-//			buffer( myX, myY )->Blue = (int) ( sampleColor.z * 255.0f );
-			*(buffer( myX, myY )) = sampleColor;
+			*(buffer( myX, myY )) = totalColor / ( sampleDimension * sampleDimension );
 		bufferLock.unlock();
 	}
 }
@@ -148,7 +162,8 @@ int main( const int argc, char* argv[] )
 
 	int x = 0;
 	int y = 0;
-	rt::Vec3 rayVector( -width / 2.0f + 0.5f, height / 2.0f - 0.5f, distToProjPlane );
+	//rt::Vec3 rayVector( -width / 2.0f + 0.5f, height / 2.0f - 0.5f, distToProjPlane );
+	rt::Vec3 rayVector( -width / 2.0f, height / 2.0f, distToProjPlane );
 
 	for ( int i = 0; i  < maxThreads; ++i )
 	{

@@ -21,3 +21,4 @@ Dithering
 Refraction
 Anti-aliasing
 HDR, floats can go above 1.0, but get clipped to 1.0 AFTER dithering
+Dithering cannot be multi-threaded, demonstrates that not all shaders can be parallel and will slow down rendering
