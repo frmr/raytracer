@@ -21,6 +21,7 @@ using std::string;
 
 std::mutex rayLock;
 std::mutex bufferLock;
+std::mutex countLock;
 
 void SetupScene( rt::RayTracer& rayTracer )
 {
@@ -57,7 +58,7 @@ void SetupScene( rt::RayTracer& rayTracer )
 }
 
 //void SampleRayTracer( const rt::RayTracer& rayTracer, const int width, const int height, rt::Vec3& rayVector, int& x, int& y, BMP& output )
-void SampleRayTracer( const rt::RayTracer& rayTracer, const int width, const int height, rt::Vec3& rayVector, int& x, int& y, rt::ScreenBuffer& buffer )
+void SampleRayTracer( const rt::RayTracer& rayTracer, const int width, const int height, rt::Vec3& rayVector, int& x, int& y, rt::ScreenBuffer& buffer, unsigned long int& sampleCount )
 {
 	rt::Vec3 myVector;
 	int myX, myY;
@@ -73,17 +74,26 @@ void SampleRayTracer( const rt::RayTracer& rayTracer, const int width, const int
 		if ( y == height )
 		{
 			y = 0;
-			rayVector.y = height / 2.0f;// - 0.5f;
+			rayVector.y = (float) height / 2.0f;// - 0.5f;
 
 			x++;
 			rayVector.x++;
 		}
 		rayLock.unlock();
 
+//		const int sampleDimension = 1;
+//		rt::Vec3 totalColor;
+//		rt::Vec3 sampleColor;
+//		rayTracer.Sample( myVector.Unit(), sampleColor );
+//		totalColor += sampleColor;
+//		countLock.lock();
+//		++sampleCount;
+//		countLock.unlock();
+
 		//cast multiple rays per pixel
 		rt::Vec3 totalColor;
-		const int sampleDimension = 3;
-		const float sampleIncrement = 1.0f / (float)(sampleDimension + 1);
+		const int sampleDimension = 1;
+		const double sampleIncrement = 1.0 / (double)(sampleDimension + 1); //must be double for sufficient accuracy
 		const float myVectorInitialY = myVector.y;
 
 		for ( int xi = 0; xi < sampleDimension; ++xi )
@@ -96,6 +106,10 @@ void SampleRayTracer( const rt::RayTracer& rayTracer, const int width, const int
 				rt::Vec3 sampleColor;
 				rayTracer.Sample( myVector.Unit(), sampleColor );
 				totalColor += sampleColor;
+
+				countLock.lock();
+				++sampleCount;
+				countLock.unlock();
 			}
 			myVector.y = myVectorInitialY;
 		}
@@ -163,11 +177,13 @@ int main( const int argc, char* argv[] )
 	int x = 0;
 	int y = 0;
 	//rt::Vec3 rayVector( -width / 2.0f + 0.5f, height / 2.0f - 0.5f, distToProjPlane );
-	rt::Vec3 rayVector( -width / 2.0f, height / 2.0f, distToProjPlane );
+	rt::Vec3 rayVector( (float) -width / 2.0f, (float) height / 2.0f, distToProjPlane );
+
+	unsigned long int sampleCount = 0;
 
 	for ( int i = 0; i  < maxThreads; ++i )
 	{
-		threads.push_back( std::thread( SampleRayTracer, std::cref(rayTracer), width, height, std::ref( rayVector ), std::ref(x), std::ref(y), std::ref(buffer) ) );
+		threads.push_back( std::thread( SampleRayTracer, std::cref(rayTracer), width, height, std::ref( rayVector ), std::ref(x), std::ref(y), std::ref(buffer), std::ref(sampleCount) ) );
 	}
 
 	cout << "Using " << threads.size() << " threads." << endl;
@@ -194,6 +210,7 @@ int main( const int argc, char* argv[] )
 	endTime = std::chrono::system_clock::now();
 	std::chrono::duration<double> elapsed_seconds = endTime - startTime;
 	cout << "Rendered in " << elapsed_seconds.count() << " seconds." << endl;
+	cout << "Used " << sampleCount << " samples." << endl;
 
 	cout << "Outputting to " << outputFilename << ".bmp" << endl;
 

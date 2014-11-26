@@ -3,8 +3,6 @@
 
 namespace rt
 {
-	class GeoCoord;
-
 	class Vec3
 	{
 	public:
