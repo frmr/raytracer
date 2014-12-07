@@ -8,7 +8,7 @@ using std::vector;
 
 int rt::RayTracer::Shape::idCounter = 0;
 
-void rt::RayTracer::Shape::SpawnReflectionRay( const rt::Vec3& intersection, const rt::Vec3& rayVector, const rt::Vec3& normal, const float rayPower, const vector<Light>& lightsRef, const vector<shared_ptr<Shape>>& shapesRef, rt::Vec3& rayColor ) const
+void rt::RayTracer::Shape::SpawnReflectionRay( const rt::Vec3& intersection, const rt::Vec3& rayVector, const rt::Vec3& normal, const float rayPower, const rt::Vec3& ambientLight, const vector<Light>& lightsRef, const vector<shared_ptr<Shape>>& shapesRef, rt::Vec3& rayColor ) const
 {
 	rt::Vec3 reflectedRayVector = rayVector - normal * 2.0f * rt::DotProduct( rayVector, normal );
 
@@ -36,14 +36,8 @@ void rt::RayTracer::Shape::SpawnReflectionRay( const rt::Vec3& intersection, con
 	//cast ray to closest shape
 	if ( closestShape != nullptr )
 	{
-		closestShape->Hit( intersection, reflectedRayVector, closestDepth, rayPower, lightsRef, shapesRef, rayColor );
+		closestShape->Hit( intersection, reflectedRayVector, closestDepth, rayPower, ambientLight, lightsRef, shapesRef, rayColor );
 	}
-}
-
-bool rt::RayTracer::Shape::UpdateColor( const rt::Vec3& rayVector, const rt::Vec3& lightVector, const rt::Vec3& surfaceNormal, rt::Vec3& rayColor ) const
-{
-	rayColor += diffuse * rt::DotProduct( surfaceNormal, lightVector );
-	return true;
 }
 
 rt::RayTracer::Shape::Shape()

@@ -40,7 +40,7 @@ struct Parameters
 	float focalDepth;
 };
 
-void SetupScene( rt::RayTracer& rayTracer )
+void SetupScene1( rt::RayTracer& rayTracer )
 {
 	rayTracer.AddSphere( rt::Vec3( -8.0f, 0.0f, 10.0f ), 1.0f, rt::Vec3( 1.0f, 0.0f, 0.0f ), rt::Vec3( 1.0f, 0.0f, 0.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 0.75f );
 	rayTracer.AddSphere( rt::Vec3( 0.0f, -7.0f, 10.0f ), 1.0f, rt::Vec3( 0.0f, 1.0f, 0.0f ), rt::Vec3( 0.0f, 1.0f, 0.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 0.75f );
@@ -72,6 +72,36 @@ void SetupScene( rt::RayTracer& rayTracer )
 	rayTracer.AddLight( rt::Vec3( 0.0f, 5.0f, 5.0f ), rt::Vec3( 0.5f, 0.5f, 0.5f ) );
 	rayTracer.AddLight( rt::Vec3( 0.0f, -5.0f, 5.0f ), rt::Vec3( 0.5f, 0.5f, 0.5f ) );
 	//rayTracer.AddLight( rt::Vec3( 0.0f, -5.0f, 5.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 1.0f );
+}
+
+
+void SetupScene2( rt::RayTracer& rayTracer )
+{
+	rayTracer.AddLight( rt::Vec3( -20.0f, 20.0f, 10.0f ), rt::Vec3( 0.5f, 0.5f, 0.5f ) );
+	rayTracer.AddLight( rt::Vec3( 20.0f, 10.0f, 5.0f ), rt::Vec3( 0.25f, 0.25f, 0.25f ) );
+	rayTracer.SetAmbientLight( rt::Vec3( 0.1f, 0.1f, 0.1f ) );
+
+	rayTracer.AddTriangle( rt::Vec3( -100.0f, -2.0f, 100.0f ), rt::Vec3( 100.0f, -2.0f, 100.0f ), rt::Vec3( 100.0f, -2.0f, -100.0f ), rt::Vec3( 0.5f, 0.5f, 0.5f ), rt::Vec3( 0.5f, 0.5f, 0.5f ), rt::Vec3( 0.0f, 0.0f, 0.0f ), 0.1f );
+	rayTracer.AddTriangle( rt::Vec3( -100.0f, -2.0f, 100.0f ), rt::Vec3( 100.0f, -2.0f, -100.0f ), rt::Vec3( -100.0f, -2.0f, -100.0f ), rt::Vec3( 0.5f, 0.5f, 0.5f ), rt::Vec3( 0.5f, 0.5f, 0.5f ), rt::Vec3( 0.0f, 0.0f, 0.0f ), 0.1f );
+
+	//Red
+	rayTracer.AddSphere( rt::Vec3( -3.0f, 0.0f, 9.0f ), 2.0f, rt::Vec3( 1.0f, 0.0f, 0.0f ), rt::Vec3( 1.0f, 0.0f, 0.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 0.5f );
+	//Green
+	rayTracer.AddSphere( rt::Vec3( -2.0f, -1.0f, 6.0f ), 1.0f, rt::Vec3( 0.0f, 1.0f, 0.0f ), rt::Vec3( 0.0f, 1.0f, 0.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 0.5f );
+	//Blue
+	rayTracer.AddSphere( rt::Vec3( 2.0f, -0.6f, 8.0f ), 1.4f, rt::Vec3( 0.0f, 0.0f, 1.0f ), rt::Vec3( 0.0f, 0.0f, 1.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 0.5f );
+	//Pink
+	rayTracer.AddSphere( rt::Vec3( 5.0f, -1.0f, 7.0f ), 1.0f, rt::Vec3( 1.0f, 0.0f, 1.0f ), rt::Vec3( 1.0f, 0.0f, 1.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 0.5f );
+	//Cyan
+	rayTracer.AddSphere( rt::Vec3( 6.0f, -1.0f, 9.0f ), 1.0f, rt::Vec3( 0.0f, 1.0f, 1.0f ), rt::Vec3( 0.0f, 1.0f, 1.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 0.5f );
+	//Yellow
+	rayTracer.AddSphere( rt::Vec3( 4.0f, 1.0f, 12.0f ), 3.0f, rt::Vec3( 1.0f, 1.0f, 0.0f ), rt::Vec3( 1.0f, 1.0f, 0.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 0.5f );
+	//Orange
+	rayTracer.AddSphere( rt::Vec3( -1.0f, -1.0f, 12.0f ), 1.0f, rt::Vec3( 1.0f, 0.5f, 0.0f ), rt::Vec3( 1.0f, 0.5f, 0.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 0.5f );
+	//Purple
+	rayTracer.AddSphere( rt::Vec3( 1.0f, -1.0f, 14.0f ), 1.0f, rt::Vec3( 0.5f, 0.0f, 1.0f ), rt::Vec3( 0.5f, 0.0f, 1.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 0.5f );
+	//Light blue
+	rayTracer.AddSphere( rt::Vec3( -1.0f, -0.6f, 16.5f ), 1.4f, rt::Vec3( 0.0f, 0.5f, 1.0f ), rt::Vec3( 0.0f, 0.5f, 1.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 0.5f );
 }
 
 //void SampleRayTracer( const rt::RayTracer& rayTracer, const int width, const int height, rt::Vec3& rayVector, int& x, int& y, BMP& output )
@@ -143,7 +173,7 @@ void SampleRayTracer( const rt::RayTracer& rayTracer, const Parameters& params, 
 
 int main( const int argc, char* argv[] )
 {
-	Parameters params = { 800, 600, rt::halfPi, "output", 1, 1, 100, 0.0f, 1.0f };
+	Parameters params = { 800, 600, rt::halfPi, "output", 1, 1, 1, 0.0f, 1.0f };
 
 	for ( int argi = 1; argi < argc; ++argi )
 	{
@@ -189,8 +219,6 @@ int main( const int argc, char* argv[] )
 		}
 	}
 
-	float fovY = params.fovX * (float) params.height / (float) params.width;
-
 	float distToProjPlane = ( (float) params.width / 2.0f ) / tan( params.fovX / 2.0f );
 
     cout	<< "Width:\t\t" << params.width << endl
@@ -205,7 +233,7 @@ int main( const int argc, char* argv[] )
     cout << "Will output to " << params.outputFilename << ".bmp" << endl;
 
 	rt::RayTracer rayTracer;
-	SetupScene( rayTracer );
+	SetupScene2( rayTracer );
 
 	rt::ScreenBuffer buffer( params.width, params.height );
 

@@ -59,14 +59,17 @@ rt::RayTracer::rtError rt::RayTracer::Sample( const rt::Vec3& rayOrigin, const r
 	//cast ray to closest shape
 	if ( closestShape != nullptr )
 	{
-		closestShape->Hit( rayOrigin, rayVector, closestDepth, 1.0f, lights, shapes, sampleColor );
+		closestShape->Hit( rayOrigin, rayVector, closestDepth, 1.0f, ambientLight, lights, shapes, sampleColor );
 	}
 
 	return rt::RayTracer::rtError::SUCCESS;
 }
 
+void rt::RayTracer::SetAmbientLight( const rt::Vec3& ambient )
+{
+	ambientLight = ambient;
+}
+
 rt::RayTracer::RayTracer()
-	:	depthOfField( false ),
-		focalDepth( 10.0f )
 {
 }
