@@ -28,7 +28,31 @@ Use "stochastic" in reference to depth of field and global illumination
 
 Report
 	Introduction
+	Features
+		Phong shading
+		HDR rendering
+		Reflection
+		Anti-aliasing
+		Depth of field
+		Multi-threading
+		Dithering
+		Future work
 	Testing methodology
 		Strong scaling
+		Default settings (scene 2)
+			Width		800
+			Height		600
+			FOV			1.5708
+			Threads		4
+			AA Samples	2
+			DOF Samples	100
+			Aperture	0.4
+			Focal Depth	12
 		Test machine (Intel 4670K, 3.6GHz)
-	
+	Performance evaluation
+		Resolution
+			Aspect ratio must be maintained to prevent distortion of results
+		Multi-threading
+		Anti-aliasing
+		Depth of field
+		
