@@ -4,13 +4,6 @@
 
 bool rt::RayTracer::Sphere::Intersects( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, float& depth ) const
 {
-	//Check if ray is pointing the same way as the sphere is from the ray origin
-//	rt::Vec3 sphereOriginVector = ( origin - rayOrigin ).Unit();
-//	if ( rt::DotProduct(  ) )
-//	{
-//		return false;
-//	}
-
 	rt::Vec3 temp = rayOrigin - origin;
 
 	float a = rt::DotProduct( rayVector, rayVector );

@@ -23,6 +23,22 @@ using std::string;
 std::mutex bufferLock;
 std::mutex rayLock;
 
+struct Parameters
+{
+	int width;
+	int height;
+	float fovX;
+	string outputFilename;
+	int threads;
+
+	//super-sampling
+	int aaSamples; //Samples in each dimension
+
+	//depth of field
+	int dofSamples;
+	float aperture;
+	float focalDepth;
+};
 
 void SetupScene( rt::RayTracer& rayTracer )
 {
@@ -59,33 +75,28 @@ void SetupScene( rt::RayTracer& rayTracer )
 }
 
 //void SampleRayTracer( const rt::RayTracer& rayTracer, const int width, const int height, rt::Vec3& rayVector, int& x, int& y, BMP& output )
-void SampleRayTracer( const rt::RayTracer& rayTracer, const int width, const int height, rt::Vec3& rayVector, int& x, int& y, rt::ScreenBuffer& buffer )
+void SampleRayTracer( const rt::RayTracer& rayTracer, const Parameters& params, rt::Vec3& rayVector, int& x, int& y, rt::ScreenBuffer& buffer )
 {
 	rt::Vec3 myVector;
 	int myX, myY;
 
-	//depth of field parameters
-	const float apertureRadius = 0.2f;
-	const int dofSamples = 100;
-	const float focalDepth = 10.0f;
-
 	std::random_device randDevice;
     std::mt19937 mt( randDevice() );
-	std::uniform_real_distribution<float> radiusGenerator( 0.0f, apertureRadius );
+	std::uniform_real_distribution<float> radiusGenerator( 0.0f, params.aperture );
 	std::uniform_real_distribution<float> angleGenerator( 0.0f, rt::twoPi );
 
 	rayLock.lock();
-	while ( x < width )
+	while ( x < params.width )
 	{
 		myVector = rayVector;//.Unit();
 		myX = x;
 		myY = y++;
 		rayVector.y--;
 
-		if ( y == height )
+		if ( y == params.height )
 		{
 			y = 0;
-			rayVector.y = (float) height / 2.0f;// - 0.5f;
+			rayVector.y = (float) params.height / 2.0f;// - 0.5f;
 
 			x++;
 			rayVector.x++;
@@ -94,21 +105,20 @@ void SampleRayTracer( const rt::RayTracer& rayTracer, const int width, const int
 
 		//perform supersampling if sampleDimension > 1
 		rt::Vec3 totalColor;
-		const int sampleDimension = 1;
-		const double sampleIncrement = 1.0 / (double)(sampleDimension + 1); //must be double for sufficient accuracy
+		const double sampleIncrement = 1.0 / (double)( params.aaSamples + 1 ); //must be double for sufficient accuracy
 		const float myVectorInitialY = myVector.y;
 
-		for ( int xi = 0; xi < sampleDimension; ++xi )
+		for ( int xi = 0; xi < params.aaSamples; ++xi )
 		{
 			myVector.x += sampleIncrement;
-			for ( int yi = 0; yi < sampleDimension; ++yi )
+			for ( int yi = 0; yi < params.aaSamples; ++yi )
 			{
 				myVector.y -= sampleIncrement;
 
-				rt::Vec3 focalTarget = myVector.Unit() * focalDepth;
+				rt::Vec3 focalTarget = myVector.Unit() * params.focalDepth;
 
 				//modify ray randomly within aperture
-				for ( int dofSampleCount = 0; dofSampleCount < dofSamples; ++dofSampleCount )
+				for ( int dofSampleCount = 0; dofSampleCount < params.dofSamples; ++dofSampleCount )
 				{
 					rt::Vec3 sampleColor;
 
@@ -126,35 +136,52 @@ void SampleRayTracer( const rt::RayTracer& rayTracer, const int width, const int
 		}
 
 		bufferLock.lock();
-			*(buffer( myX, myY )) = totalColor / ( sampleDimension * sampleDimension * dofSamples );
+			*(buffer( myX, myY )) = totalColor / ( params.aaSamples * params.aaSamples * params.dofSamples );
 		bufferLock.unlock();
 	}
 }
 
 int main( const int argc, char* argv[] )
 {
-	int width = 1600;
-	int height = 1200;
-	float fovX = rt::halfPi;
-	string outputFilename = "output";
+	Parameters params = { 1600, 1200, rt::halfPi, "output", 4, 1, 10, 0.2f, 10.0f };
 
 	for ( int argi = 1; argi < argc; ++argi )
 	{
 		if ( !strcmp( argv[argi], "-w" ) )
 		{
-			if ( argc > argi + 1 ) width = atoi( argv[++argi] );
+			if ( argc > argi + 1 ) params.width = atoi( argv[++argi] );
 		}
 		else if ( !strcmp( argv[argi], "-h" ) )
 		{
-			if ( argc > argi + 1 ) height = atoi( argv[++argi] );
+			if ( argc > argi + 1 ) params.height = atoi( argv[++argi] );
 		}
-		else if ( !strcmp( argv[argi], "-f" ) )
+		else if ( !strcmp( argv[argi], "-x" ) )
 		{
-			if ( argc > argi + 1 ) fovX = atof( argv[++argi] );
+			if ( argc > argi + 1 ) params.fovX = atof( argv[++argi] );
 		}
 		else if ( !strcmp( argv[argi], "-o" ) )
 		{
-			if ( argc > argi + 1 ) outputFilename = argv[++argi];
+			if ( argc > argi + 1 ) params.outputFilename = argv[++argi];
+		}
+		else if ( !strcmp( argv[argi], "-t" ) )
+		{
+			if ( argc > argi + 1 ) params.threads = atoi( argv[++argi] );
+		}
+		else if ( !strcmp( argv[argi], "-s" ) )
+		{
+			if ( argc > argi + 1 ) params.aaSamples = atoi( argv[++argi] );
+		}
+		else if ( !strcmp( argv[argi], "-d" ) )
+		{
+			if ( argc > argi + 1 ) params.dofSamples = atoi( argv[++argi] );
+		}
+		else if ( !strcmp( argv[argi], "-a" ) )
+		{
+			if ( argc > argi + 1 ) params.aperture = atof( argv[++argi] );
+		}
+		else if ( !strcmp( argv[argi], "-f" ) )
+		{
+			if ( argc > argi + 1 ) params.focalDepth = atof( argv[++argi] );
 		}
 		else
 		{
@@ -162,23 +189,22 @@ int main( const int argc, char* argv[] )
 		}
 	}
 
-	float fovY = fovX * (float) height / (float) width;
+	float fovY = params.fovX * (float) params.height / (float) params.width;
 
-	float distToProjPlane = ( (float) width / 2.0f ) / tan( fovX / 2.0f );
+	float distToProjPlane = ( (float) params.width / 2.0f ) / tan( params.fovX / 2.0f );
 
-    cout << "Using width: " << width << ", height: " << height << ", fovX: " << fovX << ", fovy: " << fovY << endl;
-    cout << "Will output to " << outputFilename << ".bmp" << endl;
+    cout << "Using width: " << params.width << ", height: " << params.height << ", fovX: " << params.fovX << ", fovy: " << fovY << endl;
+    cout << "Will output to " << params.outputFilename << ".bmp" << endl;
 
 	rt::RayTracer rayTracer;
 	SetupScene( rayTracer );
 
-	rt::ScreenBuffer buffer( width, height );
+	rt::ScreenBuffer buffer( params.width, params.height );
 
 	//Create output bitmap
 	BMP output;
-	output.SetSize( width, height );
+	output.SetSize( params.width, params.height );
 
-	const int maxThreads = 4;
 	vector<std::thread> threads;
 
 	//Start the timer
@@ -188,11 +214,11 @@ int main( const int argc, char* argv[] )
 	int x = 0;
 	int y = 0;
 	//rt::Vec3 rayVector( -width / 2.0f + 0.5f, height / 2.0f - 0.5f, distToProjPlane );
-	rt::Vec3 rayVector( (float) -width / 2.0f, (float) height / 2.0f, distToProjPlane );
+	rt::Vec3 rayVector( (float) -params.width / 2.0f, (float) params.height / 2.0f, distToProjPlane );
 
-	for ( int i = 0; i  < maxThreads; ++i )
+	for ( int i = 0; i  < params.threads; ++i )
 	{
-		threads.push_back( std::thread( SampleRayTracer, std::cref(rayTracer), width, height, std::ref( rayVector ), std::ref(x), std::ref(y), std::ref(buffer) ) );
+		threads.push_back( std::thread( SampleRayTracer, std::cref(rayTracer), params, std::ref( rayVector ), std::ref(x), std::ref(y), std::ref(buffer) ) );
 	}
 
 	cout << "Using " << threads.size() << " threads." << endl;
@@ -204,9 +230,9 @@ int main( const int argc, char* argv[] )
 
 	buffer.Dither();
 
-	for ( int x = 0; x < width; ++x )
+	for ( int x = 0; x < params.width; ++x )
 	{
-		for ( int y = 0; y < height; ++y )
+		for ( int y = 0; y < params.height; ++y )
 		{
 			rt::Vec3 clipped = buffer(x,y)->UnitClip();
 			output(x,y)->Red = (int) ( clipped.x * 255.0f );
@@ -220,9 +246,9 @@ int main( const int argc, char* argv[] )
 	std::chrono::duration<double> elapsed_seconds = endTime - startTime;
 	cout << "Rendered in " << elapsed_seconds.count() << " seconds." << endl;
 
-	cout << "Outputting to " << outputFilename << ".bmp" << endl;
+	cout << "Outputting to " << params.outputFilename << ".bmp" << endl;
 
-	output.WriteToFile( ( outputFilename + ".bmp" ).c_str() );
+	output.WriteToFile( ( params.outputFilename + ".bmp" ).c_str() );
 
 	cout << "Done" << endl;
 
