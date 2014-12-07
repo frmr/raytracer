@@ -4,6 +4,7 @@
 #include <iostream>
 #include <memory>
 #include <mutex>
+#include <random>
 #include <string>
 #include <thread>
 #include <utility>
@@ -19,9 +20,9 @@ using std::cout;
 using std::endl;
 using std::string;
 
-std::mutex rayLock;
 std::mutex bufferLock;
-std::mutex countLock;
+std::mutex rayLock;
+
 
 void SetupScene( rt::RayTracer& rayTracer )
 {
@@ -58,10 +59,20 @@ void SetupScene( rt::RayTracer& rayTracer )
 }
 
 //void SampleRayTracer( const rt::RayTracer& rayTracer, const int width, const int height, rt::Vec3& rayVector, int& x, int& y, BMP& output )
-void SampleRayTracer( const rt::RayTracer& rayTracer, const int width, const int height, rt::Vec3& rayVector, int& x, int& y, rt::ScreenBuffer& buffer, unsigned long int& sampleCount )
+void SampleRayTracer( const rt::RayTracer& rayTracer, const int width, const int height, rt::Vec3& rayVector, int& x, int& y, rt::ScreenBuffer& buffer )
 {
 	rt::Vec3 myVector;
 	int myX, myY;
+
+	//depth of field parameters
+	const float apertureRadius = 0.2f;
+	const int dofSamples = 100;
+	const float focalDepth = 10.0f;
+
+	std::random_device randDevice;
+    std::mt19937 mt( randDevice() );
+	std::uniform_real_distribution<float> radiusGenerator( 0.0f, apertureRadius );
+	std::uniform_real_distribution<float> angleGenerator( 0.0f, rt::twoPi );
 
 	rayLock.lock();
 	while ( x < width )
@@ -81,16 +92,7 @@ void SampleRayTracer( const rt::RayTracer& rayTracer, const int width, const int
 		}
 		rayLock.unlock();
 
-//		const int sampleDimension = 1;
-//		rt::Vec3 totalColor;
-//		rt::Vec3 sampleColor;
-//		rayTracer.Sample( myVector.Unit(), sampleColor );
-//		totalColor += sampleColor;
-//		countLock.lock();
-//		++sampleCount;
-//		countLock.unlock();
-
-		//cast multiple rays per pixel
+		//perform supersampling if sampleDimension > 1
 		rt::Vec3 totalColor;
 		const int sampleDimension = 1;
 		const double sampleIncrement = 1.0 / (double)(sampleDimension + 1); //must be double for sufficient accuracy
@@ -102,20 +104,29 @@ void SampleRayTracer( const rt::RayTracer& rayTracer, const int width, const int
 			for ( int yi = 0; yi < sampleDimension; ++yi )
 			{
 				myVector.y -= sampleIncrement;
-				//myVector = myVector.Unit();
-				rt::Vec3 sampleColor;
-				rayTracer.Sample( myVector.Unit(), sampleColor );
-				totalColor += sampleColor;
 
-				countLock.lock();
-				++sampleCount;
-				countLock.unlock();
+				rt::Vec3 focalTarget = myVector.Unit() * focalDepth;
+
+				//modify ray randomly within aperture
+				for ( int dofSampleCount = 0; dofSampleCount < dofSamples; ++dofSampleCount )
+				{
+					rt::Vec3 sampleColor;
+
+					//Generate a random point on the aperture
+					const float randRadius = radiusGenerator(mt);
+					rt::Vec3 dofOrigin(	randRadius * sin( angleGenerator(mt) ),
+										randRadius * cos( angleGenerator(mt) ),
+										0.0f );
+
+					rayTracer.Sample( dofOrigin, ( focalTarget - dofOrigin ).Unit(), sampleColor );
+					totalColor += sampleColor;
+				}
 			}
 			myVector.y = myVectorInitialY;
 		}
 
 		bufferLock.lock();
-			*(buffer( myX, myY )) = totalColor / ( sampleDimension * sampleDimension );
+			*(buffer( myX, myY )) = totalColor / ( sampleDimension * sampleDimension * dofSamples );
 		bufferLock.unlock();
 	}
 }
@@ -179,11 +190,9 @@ int main( const int argc, char* argv[] )
 	//rt::Vec3 rayVector( -width / 2.0f + 0.5f, height / 2.0f - 0.5f, distToProjPlane );
 	rt::Vec3 rayVector( (float) -width / 2.0f, (float) height / 2.0f, distToProjPlane );
 
-	unsigned long int sampleCount = 0;
-
 	for ( int i = 0; i  < maxThreads; ++i )
 	{
-		threads.push_back( std::thread( SampleRayTracer, std::cref(rayTracer), width, height, std::ref( rayVector ), std::ref(x), std::ref(y), std::ref(buffer), std::ref(sampleCount) ) );
+		threads.push_back( std::thread( SampleRayTracer, std::cref(rayTracer), width, height, std::ref( rayVector ), std::ref(x), std::ref(y), std::ref(buffer) ) );
 	}
 
 	cout << "Using " << threads.size() << " threads." << endl;
@@ -210,7 +219,6 @@ int main( const int argc, char* argv[] )
 	endTime = std::chrono::system_clock::now();
 	std::chrono::duration<double> elapsed_seconds = endTime - startTime;
 	cout << "Rendered in " << elapsed_seconds.count() << " seconds." << endl;
-	cout << "Used " << sampleCount << " samples." << endl;
 
 	cout << "Outputting to " << outputFilename << ".bmp" << endl;
 

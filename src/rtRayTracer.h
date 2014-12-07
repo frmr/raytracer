@@ -42,13 +42,13 @@ namespace rt
 		class Shape
 		{
 		private:
-			static int		idCounter;
+			static int			idCounter;
 		public:
-			const int		id;
-			const rt::Vec3	ambient;
-			const rt::Vec3	diffuse;
-			const rt::Vec3	specular;
-			const float		shininess;
+			const int			id;
+			const rt::Vec3		ambient;
+			const rt::Vec3		diffuse;
+			const rt::Vec3		specular;
+			const float			shininess;
 
 		protected:
 			void			SpawnReflectionRay( const rt::Vec3& intersection, const rt::Vec3& rayVector, const rt::Vec3& normal, const float rayPower, const vector<Light>& lightsRef, const vector<shared_ptr<Shape>>& shapesRef, rt::Vec3& rayColor ) const;
@@ -110,6 +110,8 @@ namespace rt
 	private:
 		vector<Light>				lights;
 		vector<shared_ptr<Shape>>	shapes;
+		bool depthOfField;
+		float focalDepth;
 
 	public:
 		bool	AddLight( const rt::Vec3 origin, const rt::Vec3 color );
@@ -120,7 +122,7 @@ namespace rt
 		bool	AddSphere( const rt::Vec3 origin, const float radius );
 		bool	AddSphere( const rt::Vec3 origin, const float radius, const rt::Vec3 ambient, const rt::Vec3 diffuse, const rt::Vec3 specular, const float shininess );
 
-		rtError Sample( const rt::Vec3& rayVector, rt::Vec3& sampleColor ) const;
+		rtError Sample( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, rt::Vec3& sampleColor ) const;
 
 	public:
 		RayTracer();

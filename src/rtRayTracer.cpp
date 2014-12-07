@@ -35,9 +35,8 @@ bool rt::RayTracer::AddSphere( const rt::Vec3 origin, const float radius, const 
 	return true;
 }
 
-rt::RayTracer::rtError rt::RayTracer::Sample( const rt::Vec3& rayVector, rt::Vec3& sampleColor ) const
+rt::RayTracer::rtError rt::RayTracer::Sample( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, rt::Vec3& sampleColor ) const
 {
-	rt::Vec3			rayOrigin;
 	float				closestDepth = std::numeric_limits<float>::max();
 	shared_ptr<Shape>	closestShape = nullptr;
 
@@ -67,5 +66,7 @@ rt::RayTracer::rtError rt::RayTracer::Sample( const rt::Vec3& rayVector, rt::Vec
 }
 
 rt::RayTracer::RayTracer()
+	:	depthOfField( false ),
+		focalDepth( 10.0f )
 {
 }
