@@ -35,7 +35,7 @@ bool rt::RayTracer::AddSphere( const rt::Vec3 origin, const float radius, const 
 	return true;
 }
 
-rt::RayTracer::rtError rt::RayTracer::Sample( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, rt::Vec3& sampleColor ) const
+rt::RayTracer::rtError rt::RayTracer::Sample( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, const int reflectionLimit, rt::Vec3& sampleColor ) const
 {
 	float				closestDepth = std::numeric_limits<float>::max();
 	shared_ptr<Shape>	closestShape = nullptr;
@@ -59,7 +59,7 @@ rt::RayTracer::rtError rt::RayTracer::Sample( const rt::Vec3& rayOrigin, const r
 	//cast ray to closest shape
 	if ( closestShape != nullptr )
 	{
-		closestShape->Hit( rayOrigin, rayVector, closestDepth, 1.0f, ambientLight, lights, shapes, sampleColor );
+		closestShape->Hit( rayOrigin, rayVector, closestDepth, reflectionLimit, 0, 1.0f, ambientLight, lights, shapes, sampleColor );
 	}
 
 	return rt::RayTracer::rtError::SUCCESS;

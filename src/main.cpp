@@ -30,6 +30,7 @@ struct Parameters
 	float fovX;
 	string outputFilename;
 	int threads;
+	int reflections;
 
 	//super-sampling
 	int aaSamples; //Samples in each dimension
@@ -158,7 +159,7 @@ void SampleRayTracer( const rt::RayTracer& rayTracer, const Parameters& params, 
 										randRadius * cos( angleGenerator(mt) ),
 										0.0f );
 
-					rayTracer.Sample( dofOrigin, ( focalTarget - dofOrigin ).Unit(), sampleColor );
+					rayTracer.Sample( dofOrigin, ( focalTarget - dofOrigin ).Unit(), params.reflections, sampleColor );
 					totalColor += sampleColor;
 				}
 			}
@@ -173,7 +174,7 @@ void SampleRayTracer( const rt::RayTracer& rayTracer, const Parameters& params, 
 
 int main( const int argc, char* argv[] )
 {
-	Parameters params = { 800, 600, rt::halfPi, "output", 1, 1, 1, 0.0f, 1.0f };
+	Parameters params = { 800, 600, rt::halfPi, "output", 1, 1, 1, 1, 0.0f, 1.0f };
 
 	for ( int argi = 1; argi < argc; ++argi )
 	{
@@ -196,6 +197,10 @@ int main( const int argc, char* argv[] )
 		else if ( !strcmp( argv[argi], "-t" ) )
 		{
 			if ( argc > argi + 1 ) params.threads = atoi( argv[++argi] );
+		}
+		else if ( !strcmp( argv[argi], "-r" ) )
+		{
+			if ( argc > argi + 1 ) params.reflections = atoi( argv[++argi] );
 		}
 		else if ( !strcmp( argv[argi], "-s" ) )
 		{
@@ -225,6 +230,7 @@ int main( const int argc, char* argv[] )
 			<< "Height:\t\t" << params.height << endl
 			<< "FOVX:\t\t" << params.fovX << endl
 			<< "Threads:\t" << params.threads << endl
+			<< "Reflections:\t" << params.reflections << endl
 			<< "AA Samples:\t" << params.aaSamples << endl
 			<< "DOF Samples:\t" << params.dofSamples << endl
 			<< "Aperture:\t" << params.aperture << endl

@@ -40,10 +40,11 @@ Report
 	Testing methodology
 		Strong scaling
 		Default settings (scene 2)
-			Width		800
-			Height		600
+			Width		640
+			Height		480
 			FOV			1.5708
 			Threads		4
+			Reflections	1
 			AA Samples	2
 			DOF Samples	100
 			Aperture	0.4
@@ -52,6 +53,7 @@ Report
 	Performance evaluation
 		Resolution
 			Aspect ratio must be maintained to prevent distortion of results
+		Reflection
 		Multi-threading
 		Anti-aliasing
 		Depth of field

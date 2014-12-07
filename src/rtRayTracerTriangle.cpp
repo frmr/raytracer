@@ -35,7 +35,7 @@ bool rt::RayTracer::Triangle::Intersects( const rt::Vec3& rayOrigin, const rt::V
 	return ( depth > 0.0f ) ? true : false;
 }
 
-bool rt::RayTracer::Triangle::Hit( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, const float depth, float rayPower, const rt::Vec3& ambientLight, const vector<Light>& lights, const vector<shared_ptr<Shape>>& shapes, rt::Vec3& rayColor ) const
+bool rt::RayTracer::Triangle::Hit( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, const float depth, const int reflectionLimit, int reflectionDepth, float rayPower, const rt::Vec3& ambientLight, const vector<Light>& lights, const vector<shared_ptr<Shape>>& shapes, rt::Vec3& rayColor ) const
 {
 	rt::Vec3 intersection = rayOrigin + rayVector * depth;
 
@@ -76,11 +76,11 @@ bool rt::RayTracer::Triangle::Hit( const rt::Vec3& rayOrigin, const rt::Vec3& ra
 	rayColor += diffuseAddition * rayPower;
 	rayColor += specularAddition * rayPower;
 
-	rayPower -= 1.0f - shininess;
+	rayPower *= shininess;
 
-	if ( rayPower > 0.0f )
+	if ( reflectionDepth < reflectionLimit )
 	{
-		SpawnReflectionRay( intersection, rayVector, normal, rayPower, ambientLight, lights, shapes, rayColor );
+		SpawnReflectionRay( intersection, rayVector, normal, reflectionLimit, reflectionDepth, rayPower, ambientLight, lights, shapes, rayColor );
 	}
 
     return true;
