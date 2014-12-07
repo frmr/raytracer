@@ -50,12 +50,44 @@ namespace rt
 			const rt::Vec3		specular;
 			const float			shininess;
 
+		private:
+			void			SpawnReflectionRay( const rt::Vec3& 					intersection,
+												const rt::Vec3& 					rayVector,
+												const rt::Vec3& 					normal,
+												const int 							reflectionLimit,
+												int 								reflectionDepth,
+												const float 						rayPower,
+												const rt::Vec3& 					ambientLight,
+												const vector<Light>& 				lightsRef,
+												const vector<shared_ptr<Shape>>&	shapesRef,
+												rt::Vec3&							rayColor ) const;
+
 		protected:
-			void			SpawnReflectionRay( const rt::Vec3& intersection, const rt::Vec3& rayVector, const rt::Vec3& normal, const int reflectionLimit, int reflectionDepth, const float rayPower, const rt::Vec3& ambientLight, const vector<Light>& lightsRef, const vector<shared_ptr<Shape>>& shapesRef, rt::Vec3& rayColor ) const;
+			bool			ShapeHit( 	const rt::Vec3& 					rayOrigin,
+										const rt::Vec3& 					rayVector,
+										const float 						depth,
+										const rt::Vec3& 					intersectionNormal,
+										const int 							reflectionLimit,
+										int 								reflectionDepth,
+										float 								rayPower,
+										const rt::Vec3& 					ambientLight,
+										const vector<Light>& 				lights,
+										const vector<shared_ptr<Shape>>&	shapes,
+										rt::Vec3& 							rayColor ) const;
 
 		public:
 			virtual bool	Intersects( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, float& depth ) const = 0;
-			virtual bool	Hit( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, const float depth, const int reflectionLimit, int reflectionDepth, float rayPower, const rt::Vec3& ambientLight, const vector<Light>& lights, const vector<shared_ptr<Shape>>& shapes, rt::Vec3& rayColor ) const = 0;
+
+			virtual bool	Hit( 	const rt::Vec3&						rayOrigin,
+									const rt::Vec3&						rayVector,
+									const float 						depth,
+									const int 							reflectionLimit,
+									int 								reflectionDepth,
+									float 								rayPower,
+									const rt::Vec3&						ambientLight,
+									const vector<Light>& 				lights,
+									const vector<shared_ptr<Shape>>&	shapes,
+									rt::Vec3& 							rayColor ) const = 0;
 
 		protected:
 			Shape();

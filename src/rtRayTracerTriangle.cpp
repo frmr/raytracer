@@ -37,53 +37,7 @@ bool rt::RayTracer::Triangle::Intersects( const rt::Vec3& rayOrigin, const rt::V
 
 bool rt::RayTracer::Triangle::Hit( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, const float depth, const int reflectionLimit, int reflectionDepth, float rayPower, const rt::Vec3& ambientLight, const vector<Light>& lights, const vector<shared_ptr<Shape>>& shapes, rt::Vec3& rayColor ) const
 {
-	rt::Vec3 intersection = rayOrigin + rayVector * depth;
-
-	rt::Vec3 ambientAddition = ambientLight * ambient;
-	rt::Vec3 diffuseAddition;
-	rt::Vec3 specularAddition;
-
-	for ( auto light : lights )
-	{
-		rt::Vec3 lightVector = ( light.origin - intersection ).Unit();
-		float dotLight = rt::DotProduct( normal, lightVector );
-		if ( dotLight > 0.0f )
-		{
-			bool occluded = false;
-			for ( const auto& shape : shapes )
-			{
-				if ( !( id == shape->id ) )
-				{
-					float tempDepth;
-					if ( shape->Intersects( intersection, lightVector, tempDepth ) )
-					{
-						occluded = true;
-						break;
-					}
-				}
-
-			}
-			if ( !occluded )
-			{
-				diffuseAddition += light.color * diffuse * dotLight;
-				rt::Vec3 reflectionVector = normal * 2.0f * rt::DotProduct( lightVector, normal ) - lightVector;
-				specularAddition += light.color * specular * pow( rt::DotProduct( reflectionVector, rayVector.Reverse() ), 250.0f );
-			}
-		}
-	}
-
-	rayColor += ambientAddition * rayPower;
-	rayColor += diffuseAddition * rayPower;
-	rayColor += specularAddition * rayPower;
-
-	rayPower *= shininess;
-
-	if ( reflectionDepth < reflectionLimit )
-	{
-		SpawnReflectionRay( intersection, rayVector, normal, reflectionLimit, reflectionDepth, rayPower, ambientLight, lights, shapes, rayColor );
-	}
-
-    return true;
+	return ShapeHit( rayOrigin, rayVector, depth, normal, reflectionLimit, reflectionDepth, rayPower, ambientLight, lights, shapes, rayColor );
 }
 
 rt::RayTracer::Triangle::Triangle( const rt::Vec3 v0, const rt::Vec3 v1, const rt::Vec3 v2 )

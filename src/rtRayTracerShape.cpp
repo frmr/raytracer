@@ -8,7 +8,9 @@ using std::vector;
 
 int rt::RayTracer::Shape::idCounter = 0;
 
-void rt::RayTracer::Shape::SpawnReflectionRay( const rt::Vec3& intersection, const rt::Vec3& rayVector, const rt::Vec3& normal, const int reflectionLimit, int reflectionDepth, const float rayPower, const rt::Vec3& ambientLight, const vector<Light>& lightsRef, const vector<shared_ptr<Shape>>& shapesRef, rt::Vec3& rayColor ) const
+void rt::RayTracer::Shape::SpawnReflectionRay( const rt::Vec3& intersection, const rt::Vec3& rayVector, const rt::Vec3& normal, const int reflectionLimit,
+												int reflectionDepth, const float rayPower, const rt::Vec3& ambientLight, const vector<Light>& lightsRef,
+												const vector<shared_ptr<Shape>>& shapesRef, rt::Vec3& rayColor ) const
 {
 	rt::Vec3 reflectedRayVector = rayVector - normal * 2.0f * rt::DotProduct( rayVector, normal );
 
@@ -38,6 +40,59 @@ void rt::RayTracer::Shape::SpawnReflectionRay( const rt::Vec3& intersection, con
 	{
 		closestShape->Hit( intersection, reflectedRayVector, closestDepth, reflectionLimit, ++reflectionDepth, rayPower, ambientLight, lightsRef, shapesRef, rayColor );
 	}
+}
+
+bool rt::RayTracer::Shape::ShapeHit( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, const float depth, const rt::Vec3& intersectionNormal,
+										const int reflectionLimit, int reflectionDepth, float rayPower, const rt::Vec3& ambientLight,
+										const vector<Light>& lights, const vector<shared_ptr<Shape>>& shapes, rt::Vec3& rayColor ) const
+{
+	rt::Vec3 intersection = rayOrigin + rayVector * depth;
+
+	rt::Vec3 ambientAddition = ambientLight * ambient;
+	rt::Vec3 diffuseAddition;
+	rt::Vec3 specularAddition;
+
+	for ( auto light : lights )
+	{
+		rt::Vec3 lightVector = ( light.origin - intersection ).Unit();
+		float dotLight = rt::DotProduct( intersectionNormal, lightVector );
+		if ( dotLight > 0.0f )
+		{
+			bool occluded = false;
+			for ( const auto& shape : shapes )
+			{
+				if ( !( id == shape->id ) )
+				{
+					float tempDepth;
+					if ( shape->Intersects( intersection, lightVector, tempDepth ) )
+					{
+						occluded = true;
+						break;
+					}
+				}
+
+			}
+			if ( !occluded )
+			{
+				diffuseAddition += light.color * diffuse * dotLight;
+				rt::Vec3 reflectionVector = intersectionNormal * 2.0f * rt::DotProduct( lightVector, intersectionNormal ) - lightVector;
+				specularAddition += light.color * specular * pow( rt::DotProduct( reflectionVector, rayVector.Reverse() ), 250.0f );
+			}
+		}
+	}
+
+	rayColor += ambientAddition * rayPower;
+	rayColor += diffuseAddition * rayPower;
+	rayColor += specularAddition * rayPower;
+
+	rayPower *= shininess;
+
+	if ( reflectionDepth < reflectionLimit )
+	{
+		SpawnReflectionRay( intersection, rayVector, intersectionNormal, reflectionLimit, reflectionDepth, rayPower, ambientLight, lights, shapes, rayColor );
+	}
+
+    return true;
 }
 
 rt::RayTracer::Shape::Shape()
