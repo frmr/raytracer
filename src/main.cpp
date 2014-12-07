@@ -143,7 +143,7 @@ void SampleRayTracer( const rt::RayTracer& rayTracer, const Parameters& params, 
 
 int main( const int argc, char* argv[] )
 {
-	Parameters params = { 1600, 1200, rt::halfPi, "output", 4, 1, 10, 0.2f, 10.0f };
+	Parameters params = { 800, 600, rt::halfPi, "output", 1, 1, 100, 0.0f, 1.0f };
 
 	for ( int argi = 1; argi < argc; ++argi )
 	{
@@ -193,7 +193,15 @@ int main( const int argc, char* argv[] )
 
 	float distToProjPlane = ( (float) params.width / 2.0f ) / tan( params.fovX / 2.0f );
 
-    cout << "Using width: " << params.width << ", height: " << params.height << ", fovX: " << params.fovX << ", fovy: " << fovY << endl;
+    cout	<< "Width:\t\t" << params.width << endl
+			<< "Height:\t\t" << params.height << endl
+			<< "FOVX:\t\t" << params.fovX << endl
+			<< "Threads:\t" << params.threads << endl
+			<< "AA Samples:\t" << params.aaSamples << endl
+			<< "DOF Samples:\t" << params.dofSamples << endl
+			<< "Aperture:\t" << params.aperture << endl
+			<< "Focal Depth:\t" << params.focalDepth << endl << endl;
+
     cout << "Will output to " << params.outputFilename << ".bmp" << endl;
 
 	rt::RayTracer rayTracer;
@@ -220,8 +228,6 @@ int main( const int argc, char* argv[] )
 	{
 		threads.push_back( std::thread( SampleRayTracer, std::cref(rayTracer), params, std::ref( rayVector ), std::ref(x), std::ref(y), std::ref(buffer) ) );
 	}
-
-	cout << "Using " << threads.size() << " threads." << endl;
 
 	for ( vector<std::thread>::iterator it = threads.begin(); it != threads.end(); ++it )
 	{
