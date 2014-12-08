@@ -1,5 +1,5 @@
-#ifndef RT_SCREEN_BUFFER_H
-#define RT_SCREEN_BUFFER_H
+#ifndef RT_RENDER_BUFFER_H
+#define RT_RENDER_BUFFER_H
 
 #include "rtVec3.h"
 
@@ -9,7 +9,7 @@ using std::vector;
 
 namespace rt
 {
-	class ScreenBuffer
+	class RenderBuffer
 	{
 	private:
 		vector<vector<rt::Vec3>> buffer;
@@ -19,6 +19,12 @@ namespace rt
 		const int height;
 
 	private:
+		
+		//----------------------------------------------------
+		//	ClosestColor: Round float color components to the
+		//	equivalent of8-bit per channel.
+		//----------------------------------------------------
+		
 		static rt::Vec3 ClosestColor( rt::Vec3& color )
 		{
 			return rt::Vec3(	(float) ( (int) ( color.x * 255.0f ) ) / 255.0f,
@@ -27,6 +33,12 @@ namespace rt
 		}
 
 	public:
+		
+		//----------------------------------------------------
+		//	Dither: Apply Floyd–Steinberg dithering, reducing
+		//	the float-based colors to standard 24-bit color.
+		//----------------------------------------------------
+		
 		void Dither()
 		{
 			for ( int y = 0; y < height - 1; ++y )
@@ -55,7 +67,7 @@ namespace rt
 		}
 
 	public:
-		ScreenBuffer( const int width, const int height )
+		RenderBuffer( const int width, const int height )
 			:	buffer( width, vector<rt::Vec3>( height, rt::Vec3() ) ),
 				width( width ),
 				height( height )
@@ -66,4 +78,4 @@ namespace rt
 	};
 }
 
-#endif // RT_SCREEN_BUFFER_H
+#endif // RT_RENDER_BUFFER_H

@@ -13,7 +13,7 @@
 
 #include "rtMath.h"
 #include "rtRayTracer.h"
-#include "rtScreenBuffer.h"
+#include "rtRenderBuffer.h"
 #include "rtVec3.h"
 
 using std::cout;
@@ -22,6 +22,10 @@ using std::string;
 
 std::mutex bufferLock;
 std::mutex rayLock;
+
+//---------------------------------------------------
+//	Parameters: Struct containing render parameters.
+//---------------------------------------------------
 
 struct Parameters
 {
@@ -48,7 +52,6 @@ void SetupScene1( rt::RayTracer& rayTracer )
 	rayTracer.AddSphere( rt::Vec3( 0.0f, 0.0f, 15.0f ), 1.0f, rt::Vec3( 0.0f, 0.0f, 1.0f ), rt::Vec3( 0.0f, 0.0f, 1.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 0.75f );
 	rayTracer.AddSphere( rt::Vec3( 0.0f, 5.0f, 20.0f ), 1.0f, rt::Vec3( 1.0f, 0.0f, 1.0f ), rt::Vec3( 1.0f, 0.0f, 1.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 0.75f );
 	rayTracer.AddSphere( rt::Vec3( 5.0f, 0.0f, 20.0f ), 1.0f, rt::Vec3( 1.0f, 1.0f, 0.0f ), rt::Vec3( 1.0f, 1.0f, 0.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 0.75f );
-	//rayTracer.AddSphere( rt::Vec3( 3.0f, 3.0f, 6.0f ), 1.0f, rt::Vec3( 0.0f, 1.0f, 1.0f ), 0.5f );
 
 	//left side
 	rayTracer.AddTriangle( rt::Vec3( -20.0f, 20.0f, 0.0f ), rt::Vec3( -20.0f, 20.0f, 25.0f ), rt::Vec3( -20.0f, -20.0f, 0.0f ), rt::Vec3( 0.5f, 0.5f, 0.5f ), rt::Vec3( 0.5f, 0.5f, 0.5f ), rt::Vec3( 0.0f, 0.0f, 0.0f ), 0.0f );
@@ -72,7 +75,6 @@ void SetupScene1( rt::RayTracer& rayTracer )
 
 	rayTracer.AddLight( rt::Vec3( 0.0f, 5.0f, 5.0f ), rt::Vec3( 0.5f, 0.5f, 0.5f ) );
 	rayTracer.AddLight( rt::Vec3( 0.0f, -5.0f, 5.0f ), rt::Vec3( 0.5f, 0.5f, 0.5f ) );
-	//rayTracer.AddLight( rt::Vec3( 0.0f, -5.0f, 5.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 1.0f );
 }
 
 
@@ -85,32 +87,29 @@ void SetupScene2( rt::RayTracer& rayTracer )
 	rayTracer.AddTriangle( rt::Vec3( -100.0f, -2.0f, 100.0f ), rt::Vec3( 100.0f, -2.0f, 100.0f ), rt::Vec3( 100.0f, -2.0f, -100.0f ), rt::Vec3( 0.5f, 0.5f, 0.5f ), rt::Vec3( 0.5f, 0.5f, 0.5f ), rt::Vec3( 0.0f, 0.0f, 0.0f ), 0.1f );
 	rayTracer.AddTriangle( rt::Vec3( -100.0f, -2.0f, 100.0f ), rt::Vec3( 100.0f, -2.0f, -100.0f ), rt::Vec3( -100.0f, -2.0f, -100.0f ), rt::Vec3( 0.5f, 0.5f, 0.5f ), rt::Vec3( 0.5f, 0.5f, 0.5f ), rt::Vec3( 0.0f, 0.0f, 0.0f ), 0.1f );
 
-	//Red
-	rayTracer.AddSphere( rt::Vec3( -3.0f, 0.0f, 9.0f ), 2.0f, rt::Vec3( 1.0f, 0.0f, 0.0f ), rt::Vec3( 1.0f, 0.0f, 0.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 0.5f );
-	//Green
-	rayTracer.AddSphere( rt::Vec3( -2.0f, -1.0f, 6.0f ), 1.0f, rt::Vec3( 0.0f, 1.0f, 0.0f ), rt::Vec3( 0.0f, 1.0f, 0.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 0.5f );
-	//Blue
-	rayTracer.AddSphere( rt::Vec3( 2.0f, -0.6f, 8.0f ), 1.4f, rt::Vec3( 0.0f, 0.0f, 1.0f ), rt::Vec3( 0.0f, 0.0f, 1.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 0.5f );
-	//Pink
-	rayTracer.AddSphere( rt::Vec3( 5.0f, -1.0f, 7.0f ), 1.0f, rt::Vec3( 1.0f, 0.0f, 1.0f ), rt::Vec3( 1.0f, 0.0f, 1.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 0.5f );
-	//Cyan
-	rayTracer.AddSphere( rt::Vec3( 6.0f, -1.0f, 9.0f ), 1.0f, rt::Vec3( 0.0f, 1.0f, 1.0f ), rt::Vec3( 0.0f, 1.0f, 1.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 0.5f );
-	//Yellow
-	rayTracer.AddSphere( rt::Vec3( 4.0f, 1.0f, 12.0f ), 3.0f, rt::Vec3( 1.0f, 1.0f, 0.0f ), rt::Vec3( 1.0f, 1.0f, 0.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 0.5f );
-	//Orange
-	rayTracer.AddSphere( rt::Vec3( -1.0f, -1.0f, 12.0f ), 1.0f, rt::Vec3( 1.0f, 0.5f, 0.0f ), rt::Vec3( 1.0f, 0.5f, 0.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 0.5f );
-	//Purple
-	rayTracer.AddSphere( rt::Vec3( 1.0f, -1.0f, 14.0f ), 1.0f, rt::Vec3( 0.5f, 0.0f, 1.0f ), rt::Vec3( 0.5f, 0.0f, 1.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 0.5f );
-	//Light blue
-	rayTracer.AddSphere( rt::Vec3( -1.0f, -0.6f, 16.5f ), 1.4f, rt::Vec3( 0.0f, 0.5f, 1.0f ), rt::Vec3( 0.0f, 0.5f, 1.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 0.5f );
+	rayTracer.AddSphere( rt::Vec3( -3.0f, 0.0f, 9.0f ), 2.0f, rt::Vec3( 1.0f, 0.0f, 0.0f ), rt::Vec3( 1.0f, 0.0f, 0.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 0.5f );		//Red
+	rayTracer.AddSphere( rt::Vec3( -2.0f, -1.0f, 6.0f ), 1.0f, rt::Vec3( 0.0f, 1.0f, 0.0f ), rt::Vec3( 0.0f, 1.0f, 0.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 0.5f );	//Green
+	rayTracer.AddSphere( rt::Vec3( 2.0f, -0.6f, 8.0f ), 1.4f, rt::Vec3( 0.0f, 0.0f, 1.0f ), rt::Vec3( 0.0f, 0.0f, 1.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 0.5f );		//Blue
+	rayTracer.AddSphere( rt::Vec3( 5.0f, -1.0f, 7.0f ), 1.0f, rt::Vec3( 1.0f, 0.0f, 1.0f ), rt::Vec3( 1.0f, 0.0f, 1.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 0.5f );		//Pink
+	rayTracer.AddSphere( rt::Vec3( 6.0f, -1.0f, 9.0f ), 1.0f, rt::Vec3( 0.0f, 1.0f, 1.0f ), rt::Vec3( 0.0f, 1.0f, 1.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 0.5f );		//Cyan
+	rayTracer.AddSphere( rt::Vec3( 4.0f, 1.0f, 12.0f ), 3.0f, rt::Vec3( 1.0f, 1.0f, 0.0f ), rt::Vec3( 1.0f, 1.0f, 0.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 0.5f );		//Yellow
+	rayTracer.AddSphere( rt::Vec3( -1.0f, -1.0f, 12.0f ), 1.0f, rt::Vec3( 1.0f, 0.5f, 0.0f ), rt::Vec3( 1.0f, 0.5f, 0.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 0.5f );	//Orange
+	rayTracer.AddSphere( rt::Vec3( 1.0f, -1.0f, 14.0f ), 1.0f, rt::Vec3( 0.5f, 0.0f, 1.0f ), rt::Vec3( 0.5f, 0.0f, 1.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 0.5f );	//Purple
+	rayTracer.AddSphere( rt::Vec3( -1.0f, -0.6f, 16.5f ), 1.4f, rt::Vec3( 0.0f, 0.5f, 1.0f ), rt::Vec3( 0.0f, 0.5f, 1.0f ), rt::Vec3( 1.0f, 1.0f, 1.0f ), 0.5f );	//Light blue
 }
 
-//void SampleRayTracer( const rt::RayTracer& rayTracer, const int width, const int height, rt::Vec3& rayVector, int& x, int& y, BMP& output )
-void SampleRayTracer( const rt::RayTracer& rayTracer, const Parameters& params, rt::Vec3& rayVector, int& x, int& y, rt::ScreenBuffer& buffer )
+//--------------------------------------------------------------------------------------------
+//  SampleRayTracer: Function called by each thread.
+//	Increments the X and Y coordinates of the buffer until the picture is completely sampled.
+//	Anti-aliasing and depth of field are also performed here.
+//--------------------------------------------------------------------------------------------
+
+void SampleRayTracer( const rt::RayTracer& rayTracer, const Parameters& params, rt::Vec3& rayVector, int& x, int& y, rt::RenderBuffer& buffer )
 {
 	rt::Vec3 myVector;
 	int myX, myY;
 
+	//Initialise random number generators
 	std::random_device randDevice;
     std::mt19937 mt( randDevice() );
 	std::uniform_real_distribution<float> radiusGenerator( 0.0f, params.aperture );
@@ -119,24 +118,26 @@ void SampleRayTracer( const rt::RayTracer& rayTracer, const Parameters& params, 
 	rayLock.lock();
 	while ( x < params.width )
 	{
-		myVector = rayVector;//.Unit();
+		//Get the next pixel to be computed
+		myVector = rayVector;
 		myX = x;
 		myY = y++;
 		rayVector.y--;
 
 		if ( y == params.height )
 		{
+			//Reset the coordinates to the start of the next column
 			y = 0;
-			rayVector.y = (float) params.height / 2.0f;// - 0.5f;
+			rayVector.y = (float) params.height / 2.0f;;
 
 			x++;
 			rayVector.x++;
 		}
 		rayLock.unlock();
 
-		//perform supersampling if sampleDimension > 1
+		//Perform supersampling
 		rt::Vec3 totalColor;
-		const double sampleIncrement = 1.0 / (double)( params.aaSamples + 1 ); //must be double for sufficient accuracy
+		const double sampleIncrement = 1.0 / (double)( params.aaSamples + 1 );	//Must be double for sufficient accuracy
 		const float myVectorInitialY = myVector.y;
 
 		for ( int xi = 0; xi < params.aaSamples; ++xi )
@@ -146,6 +147,7 @@ void SampleRayTracer( const rt::RayTracer& rayTracer, const Parameters& params, 
 			{
 				myVector.y -= sampleIncrement;
 
+				//Perform depth of field sampling
 				rt::Vec3 focalTarget = myVector.Unit() * params.focalDepth;
 
 				//modify ray randomly within aperture
@@ -153,7 +155,7 @@ void SampleRayTracer( const rt::RayTracer& rayTracer, const Parameters& params, 
 				{
 					rt::Vec3 sampleColor;
 
-					//Generate a random point on the aperture
+					//Generate a random point on the circular aperture
 					const float randRadius = radiusGenerator(mt);
 					rt::Vec3 dofOrigin(	randRadius * sin( angleGenerator(mt) ),
 										randRadius * cos( angleGenerator(mt) ),
@@ -166,6 +168,7 @@ void SampleRayTracer( const rt::RayTracer& rayTracer, const Parameters& params, 
 			myVector.y = myVectorInitialY;
 		}
 
+		//Write color to the buffer
 		bufferLock.lock();
 			*(buffer( myX, myY )) = totalColor / ( params.aaSamples * params.aaSamples * params.dofSamples );
 		bufferLock.unlock();
@@ -176,6 +179,7 @@ int main( const int argc, char* argv[] )
 {
 	Parameters params = { 800, 600, rt::halfPi, "output", 1, 1, 1, 1, 0.0f, 1.0f };
 
+	//Get parameters from the command line
 	for ( int argi = 1; argi < argc; ++argi )
 	{
 		if ( !strcmp( argv[argi], "-w" ) )
@@ -241,13 +245,11 @@ int main( const int argc, char* argv[] )
 	rt::RayTracer rayTracer;
 	SetupScene2( rayTracer );
 
-	rt::ScreenBuffer buffer( params.width, params.height );
+	rt::RenderBuffer buffer( params.width, params.height );
 
 	//Create output bitmap
 	BMP output;
 	output.SetSize( params.width, params.height );
-
-	vector<std::thread> threads;
 
 	//Start the timer
 	std::chrono::time_point<std::chrono::system_clock> startTime, endTime;
@@ -255,9 +257,10 @@ int main( const int argc, char* argv[] )
 
 	int x = 0;
 	int y = 0;
-	//rt::Vec3 rayVector( -width / 2.0f + 0.5f, height / 2.0f - 0.5f, distToProjPlane );
 	rt::Vec3 rayVector( (float) -params.width / 2.0f, (float) params.height / 2.0f, distToProjPlane );
 
+	//Start threads
+	vector<std::thread> threads;
 	for ( int i = 0; i  < params.threads; ++i )
 	{
 		threads.push_back( std::thread( SampleRayTracer, std::cref(rayTracer), params, std::ref( rayVector ), std::ref(x), std::ref(y), std::ref(buffer) ) );
@@ -270,6 +273,7 @@ int main( const int argc, char* argv[] )
 
 	buffer.Dither();
 
+	//Write the buffer to the output bitmap
 	for ( int x = 0; x < params.width; ++x )
 	{
 		for ( int y = 0; y < params.height; ++y )

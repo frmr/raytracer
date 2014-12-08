@@ -40,7 +40,7 @@ rt::RayTracer::rtError rt::RayTracer::Sample( const rt::Vec3& rayOrigin, const r
 	float				closestDepth = std::numeric_limits<float>::max();
 	shared_ptr<Shape>	closestShape = nullptr;
 
-	//find closest intersection
+	//Find closest intersection with a shape
 	for ( auto shape : shapes )
 	{
 		float tempDepth;
@@ -56,7 +56,7 @@ rt::RayTracer::rtError rt::RayTracer::Sample( const rt::Vec3& rayOrigin, const r
 
 	sampleColor = Vec3();
 
-	//cast ray to closest shape
+	//Cast ray to closest shape
 	if ( closestShape != nullptr )
 	{
 		closestShape->Hit( rayOrigin, rayVector, closestDepth, reflectionLimit, 0, 1.0f, ambientLight, lights, shapes, sampleColor );

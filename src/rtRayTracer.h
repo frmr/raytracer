@@ -11,6 +11,11 @@ using std::vector;
 
 namespace rt
 {
+	//-----------------------------------------------------------------------------------
+	//	RayTracer: Class that stores shapes in the scene and initiates sampling of them.
+	//	Also stores lights and controls ambient lighting.
+	//-----------------------------------------------------------------------------------
+	
 	class RayTracer
 	{
 	private:
@@ -25,7 +30,10 @@ namespace rt
 
 
 
-
+		//-------------------------------------------------------
+		//	Light: Class that stores simple lighting properties.
+		//-------------------------------------------------------
+		
 		class Light
 		{
 		public:
@@ -38,7 +46,11 @@ namespace rt
 
 
 
-
+		//-----------------------------------------------------
+		//	Shape: Base class of Sphere and Triangle classes.
+		//	Stores material properties used for Phong shading.
+		//-----------------------------------------------------
+		
 		class Shape
 		{
 		private:
@@ -51,6 +63,13 @@ namespace rt
 			const float			shininess;
 
 		private:
+			
+			//------------------------------------------------------------
+			//	SpawnReflectionRay: Computer the ray of reflection at the
+			//	point of intersection and sample the first shape it hits.
+			//	Outputs final color to rayColor.
+			//------------------------------------------------------------
+			
 			void			SpawnReflectionRay( const rt::Vec3& 					intersection,
 												const rt::Vec3& 					rayVector,
 												const rt::Vec3& 					normal,
@@ -63,6 +82,13 @@ namespace rt
 												rt::Vec3&							rayColor ) const;
 
 		protected:
+			
+			//-----------------------------------------------------------------------------------------------------
+			//	ShapeHit: Generalised method for performing coloring calculations in the event of a ray collision.
+			//	This method in the base class is called by all derived classes after they have locally determined
+			//	the normal at the point of intersection. Outputs final color to rayColor.
+			//-----------------------------------------------------------------------------------------------------
+			
 			bool			ShapeHit( 	const rt::Vec3& 					rayOrigin,
 										const rt::Vec3& 					rayVector,
 										const float 						depth,
@@ -76,8 +102,19 @@ namespace rt
 										rt::Vec3& 							rayColor ) const;
 
 		public:
+			
+			//-------------------------------------------------------------------------------------
+			//	Intersects: Pure method, returns true if incoming ray intersects shape.
+			//	Depth is set to the factor of rayVector that equates to the point of intersection.
+			//-------------------------------------------------------------------------------------
+			
 			virtual bool	Intersects( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, float& depth ) const = 0;
 
+			//-------------------------------------------------------------------------------------
+			//	Hit: Pure method, computes normal at the point of intersection and calls ShapeHit.
+			//	Outputs final color to rayColor.
+			//-------------------------------------------------------------------------------------
+			
 			virtual bool	Hit( 	const rt::Vec3&						rayOrigin,
 									const rt::Vec3&						rayVector,
 									const float 						depth,
@@ -97,6 +134,10 @@ namespace rt
 
 
 
+		//-------------------------------------------------------------------------------
+		//	Sphere: Derived class of shape, implements sphere-specific methods of shape.
+		//-------------------------------------------------------------------------------
+		
 		class Sphere : public Shape
 		{
 		public:
@@ -105,7 +146,20 @@ namespace rt
 			const float		radiusSquared;
 
 		public:
+			
+			//-------------------------------------------------------------------------------------
+			//	Intersects: Checks for intersection with incoming ray.
+			//	Returns true if the ray intersects.
+			//	Depth is set to the factor of rayVector that equates to the point of intersection.
+			//-------------------------------------------------------------------------------------
+			
 			bool	Intersects( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, float& depth ) const;
+			
+			//------------------------------------------------------------------------
+			//	Hit: Computes normal at the point of intersection and calls ShapeHit.
+			//	Outputs final color to rayColor.
+			//------------------------------------------------------------------------
+			
 			bool	Hit( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, const float depth, const int reflectionLimit, int reflectionDepth, float rayPower, const rt::Vec3& ambientLight, const vector<Light>& lights, const vector<shared_ptr<Shape>>& shapes, rt::Vec3& rayColor ) const;
 
 		public:
@@ -115,6 +169,9 @@ namespace rt
 
 
 
+		//-----------------------------------------------------------------------------------
+		//	Triangle: Derived class of shape, implements triangle-specific methods of shape.
+		//-----------------------------------------------------------------------------------
 
 		class Triangle : public Shape
 		{
@@ -127,7 +184,20 @@ namespace rt
 			const rt::Vec3 normal;
 
 		public:
+			
+			//-------------------------------------------------------------------------------------
+			//	Intersects: Checks for intersection with incoming ray.
+			//	Returns true if the ray intersects.
+			//	Depth is set to the factor of rayVector that equates to the point of intersection.
+			//-------------------------------------------------------------------------------------
+			
 			bool	Intersects( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, float& depth ) const;
+			
+			//-------------------------------------------------------
+			//	Hit: Passes pre-computed surface normal to ShapeHit.
+			//	Outputs final color to rayColor.
+			//-------------------------------------------------------
+			
 			bool	Hit( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, const float depth, const int reflectionLimit, int reflectionDepth, float rayPower, const rt::Vec3& ambientLight, const vector<Light>& lights, const vector<shared_ptr<Shape>>& shapes, rt::Vec3& rayColor ) const;
 
 		public:

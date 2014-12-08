@@ -12,12 +12,13 @@ void rt::RayTracer::Shape::SpawnReflectionRay( const rt::Vec3& intersection, con
 												int reflectionDepth, const float rayPower, const rt::Vec3& ambientLight, const vector<Light>& lightsRef,
 												const vector<shared_ptr<Shape>>& shapesRef, rt::Vec3& rayColor ) const
 {
+	//Compute vector of ray reflected at the point of intersection
 	rt::Vec3 reflectedRayVector = rayVector - normal * 2.0f * rt::DotProduct( rayVector, normal );
 
 	float				closestDepth = std::numeric_limits<float>::max();
 	shared_ptr<Shape>	closestShape = nullptr;
 
-	//find closest intersection
+	//Find closest intersection with a shape
 	for ( auto shape : shapesRef )
 	{
 		if ( shape->id != id )
@@ -35,7 +36,7 @@ void rt::RayTracer::Shape::SpawnReflectionRay( const rt::Vec3& intersection, con
 
 	}
 
-	//cast ray to closest shape
+	//Cast ray to closest shape
 	if ( closestShape != nullptr )
 	{
 		closestShape->Hit( intersection, reflectedRayVector, closestDepth, reflectionLimit, ++reflectionDepth, rayPower, ambientLight, lightsRef, shapesRef, rayColor );
@@ -52,6 +53,7 @@ bool rt::RayTracer::Shape::ShapeHit( const rt::Vec3& rayOrigin, const rt::Vec3& 
 	rt::Vec3 diffuseAddition;
 	rt::Vec3 specularAddition;
 
+	//Compute lighting at the point of intersection
 	for ( auto light : lights )
 	{
 		rt::Vec3 lightVector = ( light.origin - intersection ).Unit();
@@ -81,6 +83,7 @@ bool rt::RayTracer::Shape::ShapeHit( const rt::Vec3& rayOrigin, const rt::Vec3& 
 		}
 	}
 
+	//Add contributions of ambient, diffuse and specular lighting to the final color
 	rayColor += ambientAddition * rayPower;
 	rayColor += diffuseAddition * rayPower;
 	rayColor += specularAddition * rayPower;
