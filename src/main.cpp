@@ -43,6 +43,9 @@ struct Parameters
 	int dofSamples;
 	float aperture;
 	float focalDepth;
+
+	//dithering
+	bool dithering;
 };
 
 void SetupScene1( rt::RayTracer& rayTracer )
@@ -177,7 +180,7 @@ void SampleRayTracer( const rt::RayTracer& rayTracer, const Parameters& params, 
 
 int main( const int argc, char* argv[] )
 {
-	Parameters params = { 800, 600, rt::halfPi, "output", 1, 1, 1, 1, 0.0f, 1.0f };
+	Parameters params = { 800, 600, rt::halfPi, "output", 1, 1, 1, 1, 0.0f, 1.0f, false };
 
 	//Get parameters from the command line
 	for ( int argi = 1; argi < argc; ++argi )
@@ -221,6 +224,10 @@ int main( const int argc, char* argv[] )
 		else if ( !strcmp( argv[argi], "-f" ) )
 		{
 			if ( argc > argi + 1 ) params.focalDepth = atof( argv[++argi] );
+		}
+		else if ( !strcmp( argv[argi], "-i" ) )
+		{
+			if ( argc > argi + 1 ) params.dithering = atoi( argv[++argi] );
 		}
 		else
 		{
@@ -271,7 +278,11 @@ int main( const int argc, char* argv[] )
 		it->join();
 	}
 
-	buffer.Dither();
+	if ( params.dithering )
+	{
+		buffer.Dither();
+	}
+
 
 	//Write the buffer to the output bitmap
 	for ( int x = 0; x < params.width; ++x )

@@ -50,11 +50,12 @@ Report
 			DOF Samples	100
 			Aperture	0.4
 			Focal Depth	12
+			Dithering	On
 		Test machine (Intel 4670K, 3.6GHz)
 	Performance evaluation
 		Resolution
 			Aspect ratio must be maintained to prevent distortion of results
-		Reflection
+		Reflection (gradually fewer pixels result in another reflection ray being cast)
 		Multi-threading
 		Anti-aliasing
 		Depth of field
