@@ -57,4 +57,7 @@ Report
 		Multi-threading
 		Anti-aliasing
 		Depth of field
+	Conclusion
+		Quality vs expense of each feature
+		Profiler analysis
 		
