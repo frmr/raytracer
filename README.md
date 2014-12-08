@@ -29,6 +29,7 @@ Use "stochastic" in reference to depth of field and global illumination
 Report
 	Introduction
 	Features
+		Shadows
 		Phong shading
 		HDR rendering
 		Reflection
