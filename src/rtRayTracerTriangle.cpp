@@ -2,6 +2,18 @@
 #include "rtMath.h"
 #include <limits>
 
+//----------------------------------------------------------------------------
+//	Intersects: Checks for intersection between ray and triangle.
+//	Returns true if they intersect.
+//	Depth is to the factor of the rayVector equals the point of intersection.
+//
+//	Help with this method was derived from code supplied with:
+//		"Physical Based Rendering: From Theory to Implementation"
+//		By Matt Pharr and Greg Humphreys
+//		ISBN-10: 0123750792
+//		ISBN-13: 978-0123750792
+//----------------------------------------------------------------------------
+
 bool rt::RayTracer::Triangle::Intersects( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, float& depth ) const
 {
 	rt::Vec3 s1 = rt::CrossProduct( rayVector, v02 );

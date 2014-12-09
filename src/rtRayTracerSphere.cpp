@@ -2,6 +2,18 @@
 #include "rtMath.h"
 #include <limits>
 
+//----------------------------------------------------------------------------
+//	Intersects: Checks for intersection between ray and sphere.
+//	Returns true if they intersect.
+//	Depth is to the factor of the rayVector equals the point of intersection.
+//
+//	Help with this method was derived from code in:
+//		"Realistic Ray Tracing Second Edition"
+//		By Peter Shirley and R. Keith Morley
+//		ISBN-10: 1568814615
+//		ISBN-13: 978-1568814612
+//----------------------------------------------------------------------------
+
 bool rt::RayTracer::Sphere::Intersects( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, float& depth ) const
 {
 	rt::Vec3 temp = rayOrigin - origin;
@@ -22,6 +34,11 @@ bool rt::RayTracer::Sphere::Intersects( const rt::Vec3& rayOrigin, const rt::Vec
 		return false;
 	}
 }
+
+//-------------------------------------------
+// Hit: Computes the suface normal at the
+// point of intersection and calls ShapeHit.
+//-------------------------------------------
 
 bool rt::RayTracer::Sphere::Hit( const rt::Vec3& rayOrigin, const rt::Vec3& rayVector, const float depth, const int reflectionLimit, int reflectionDepth, float rayPower, const rt::Vec3& ambientLight, const vector<Light>& lights, const vector<shared_ptr<Shape>>& shapes, rt::Vec3& rayColor ) const
 {
