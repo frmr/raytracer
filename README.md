@@ -20,7 +20,7 @@ The following switches can be used with the supplied executable:
 	-d [value]	Sets the number of depth of field samples to use to [value]
 	-a [value]	Sets the radius of the aperture to [value]
 	-f [value]	Sets the focal distance to [value]
-	-i [value]	Turns dithering on or off when value is 1 or 0, respectively
+	-i [value]	Turns dithering on or off when [value] is 1 or 0, respectively
 
 The EasyBMP library is included in the src folder under
 the BSD Revised License.
