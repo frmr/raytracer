@@ -118,9 +118,10 @@ void SampleRayTracer( const rt::RayTracer& rayTracer, const Parameters& params, 
 	std::uniform_real_distribution<float> radiusGenerator( 0.0f, params.aperture );
 	std::uniform_real_distribution<float> angleGenerator( 0.0f, rt::twoPi );
 
-	rayLock.lock();
 	while ( x < params.width )
 	{
+		rayLock.lock();
+
 		//Get the next pixel to be computed
 		myVector = rayVector;
 		myX = x;
